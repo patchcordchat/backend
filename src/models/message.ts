@@ -1,10 +1,11 @@
-import mongoose from 'mongoose';
-const { randomUUID } = require('crypto');
+import{ Schema, model } from 'mongoose';
+import { randomUUID } from 'crypto';
 
-const channelSchema = new mongoose.Schema({
+const channelSchema = new Schema({
   _id: {
     type: 'UUID',
     default: () => randomUUID(),
+    alias: 'id'
   },
   channel_id: {
     type: 'UUID',
@@ -43,4 +44,4 @@ const channelSchema = new mongoose.Schema({
   }
 });
 
-export default mongoose.model('channel', channelSchema);
+export default model('channel', channelSchema);

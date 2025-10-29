@@ -1,10 +1,11 @@
-import mongoose from 'mongoose';
-const { randomUUID } = require('crypto');
+import{ Schema, model } from 'mongoose';
+import { randomUUID } from 'crypto';
 
-const RoleSchema = new mongoose.Schema({
+const RoleSchema = new Schema({
   _id: {
     type: 'UUID',
     default: () => randomUUID(),
+    alias: 'id'
   },
   name: {
     type: String,
@@ -30,10 +31,11 @@ const RoleSchema = new mongoose.Schema({
   }
 });
 
-const serverSchema = new mongoose.Schema({
+const serverSchema = new Schema({
   _id: {
     type: 'UUID',
     default: () => randomUUID(),
+    alias: 'id'
   },
   name: {
     type: String,
@@ -66,4 +68,4 @@ const serverSchema = new mongoose.Schema({
   },
 });
 
-export default mongoose.model('server', serverSchema);
+export default model('server', serverSchema);

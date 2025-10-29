@@ -68,7 +68,7 @@ export const getServerMembers = (
   }
 };
 
-export const searchServerMember = (
+export const searchServerMembers = (
   req: Request,
   res: Response,
   next: NextFunction,

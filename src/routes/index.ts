@@ -1,7 +1,7 @@
-import userRoutes from './userRoute';
-import serverRoutes from './serverRoute';
-import channelRoutes from './channelRoute';
-import currentUserRoutes from './currentUserRoute';
+import userRoutes from './userRoutes';
+import serverRoutes from './serverRoutes';
+import channelRoutes from './channelRoutes';
+import currentUserRoutes from './currentUserRoutes';
 
 export {
     userRoutes,

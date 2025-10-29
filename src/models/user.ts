@@ -1,10 +1,11 @@
-import mongoose from 'mongoose';
-const { randomUUID } = require('crypto');
+import{ Schema, model } from 'mongoose';
+import { randomUUID } from 'crypto';
 
-const userSchema = new mongoose.Schema({
+const userSchema = new Schema({
   _id: {
     type: 'UUID',
-    default: () => randomUUID()
+    default: () => randomUUID(),
+    alias: 'id'
   },
   username: {
     type: String,
@@ -69,4 +70,4 @@ const userSchema = new mongoose.Schema({
   }
 });
 
-export default mongoose.model('user', userSchema);
+export default model('user', userSchema);

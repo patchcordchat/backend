@@ -1,14 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 
-export const getServer = (req: Request, res: Response, next: NextFunction) => {
-  try {
-    res.json({ message: 'Success' });
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const createServer = (
+export const getCurrentUser = (
   req: Request,
   res: Response,
   next: NextFunction,
@@ -20,7 +12,7 @@ export const createServer = (
   }
 };
 
-export const modifyServer = (
+export const modifyCurrentUser = (
   req: Request,
   res: Response,
   next: NextFunction,
@@ -32,7 +24,7 @@ export const modifyServer = (
   }
 };
 
-export const deleteServer = (
+export const modifyCurrentUserAccount = (
   req: Request,
   res: Response,
   next: NextFunction,
@@ -44,7 +36,7 @@ export const deleteServer = (
   }
 };
 
-export const getServerPreview = (
+export const modifyCurrentUserProfile = (
   req: Request,
   res: Response,
   next: NextFunction,
@@ -56,7 +48,7 @@ export const getServerPreview = (
   }
 };
 
-export const getServerMembers = (
+export const disableCurrentUserAccount = (
   req: Request,
   res: Response,
   next: NextFunction,
@@ -68,7 +60,7 @@ export const getServerMembers = (
   }
 };
 
-export const searchServerMember = (
+export const deleteCurrentUserAccount = (
   req: Request,
   res: Response,
   next: NextFunction,
@@ -80,15 +72,7 @@ export const searchServerMember = (
   }
 };
 
-export const joinServer = (req: Request, res: Response, next: NextFunction) => {
-  try {
-    res.json({ message: 'Success' });
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const addServerMember = (
+export const getCurrentUserServers = (
   req: Request,
   res: Response,
   next: NextFunction,
@@ -100,7 +84,31 @@ export const addServerMember = (
   }
 };
 
-export const getServerRoles = (
+export const leaveCurrentUserFromServer = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    res.json({ message: 'Success' });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getCurrentUserPrivateChannels = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    res.json({ message: 'Success' });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const createCurrentUserPrivateChannel = (
   req: Request,
   res: Response,
   next: NextFunction,
