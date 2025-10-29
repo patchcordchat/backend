@@ -1,36 +1,50 @@
 import { Schema, model } from 'mongoose';
 import { randomUUID } from 'crypto';
-import { type IAttachment, IReaction, IAuthor, IMessage } from './message.types';
+import {
+  type IAttachment,
+  IReaction,
+  IAuthor,
+  IMessage,
+} from './message.types';
 
-const attachmentSchema = new Schema<IAttachment>({
-  id: {
-    type: Schema.Types.UUID,
-    default: () => randomUUID(),
+const attachmentSchema = new Schema<IAttachment>(
+  {
+    id: {
+      type: Schema.Types.UUID,
+      default: () => randomUUID(),
+    },
+    filename: String,
+    size: Number,
+    url: String,
+    proxy_url: String,
+    height: Number,
+    width: Number,
+    content_type: String,
   },
-  filename: String,
-  size: Number,
-  url: String,
-  proxy_url: String,
-  height: Number,
-  width: Number,
-  content_type: String,
-}, { _id: false });
+  { _id: false },
+);
 
-const reactionSchema = new Schema<IReaction>({
-  emoji: String,
-  count: Number,
-  users: [Schema.Types.UUID],
-}, { _id: false });
-
-const authorSchema = new Schema<IAuthor>({
-  id: {
-    type: Schema.Types.UUID,
-    required: true,
+const reactionSchema = new Schema<IReaction>(
+  {
+    emoji: String,
+    count: Number,
+    users: [Schema.Types.UUID],
   },
-  username: String,
-  discriminator: String,
-  avatar: String,
-}, { _id: false });
+  { _id: false },
+);
+
+const authorSchema = new Schema<IAuthor>(
+  {
+    id: {
+      type: Schema.Types.UUID,
+      required: true,
+    },
+    username: String,
+    discriminator: String,
+    avatar: String,
+  },
+  { _id: false },
+);
 
 const messageSchema = new Schema<IMessage>(
   {
@@ -43,10 +57,11 @@ const messageSchema = new Schema<IMessage>(
       type: Schema.Types.UUID,
       required: true,
     },
-    author: {},
+    author: authorSchema,
     content: {
       type: String,
       required: true,
+      maxLength: 10000,
     },
     timestamp: {
       type: Number,
@@ -75,7 +90,7 @@ const messageSchema = new Schema<IMessage>(
       default: 0,
     },
   },
-  { timestamps: true, collection: 'messages' },
+  { timestamps: false, collection: 'messages' },
 );
 
 // Добавление индексов

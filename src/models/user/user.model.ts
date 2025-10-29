@@ -13,31 +13,31 @@ const userSchema = new Schema<IUser>(
       type: String,
       required: true,
       unique: true,
+      minLength: 2,
+      maxLength: 32,
     },
     global_name: {
       type: String,
-      required: false,
+      minLength: 1,
+      maxLength: 32,
     },
     avatar: {
       type: String,
-      required: false,
     },
     bot: {
       type: Boolean,
-      required: false,
     },
     pronouns: {
       type: String,
-      required: false,
+      maxLength: 40,
     },
     bio: {
       type: String,
-      required: true,
       default: '',
+      maxLength: 190,
     },
     locale: {
       type: String,
-      required: false,
       default: 'RU',
     },
     verified: {
@@ -47,20 +47,18 @@ const userSchema = new Schema<IUser>(
     },
     email: {
       type: String,
-      required: false,
       unique: true,
       sparse: true,
     },
     phone: {
       type: String,
-      required: false,
       unique: true,
       sparse: true,
     },
     flags: {
       type: Number,
-      required: true,
       default: 0,
+      select: false,
     },
     public_flags: {
       type: Number,
@@ -77,7 +75,7 @@ const userSchema = new Schema<IUser>(
 );
 
 // Добавление индексов
-userSchema.index({ username: 'text', global_name: 'text'});
+userSchema.index({ username: 'text', global_name: 'text' });
 userSchema.index({ email: 1 }, { sparse: true });
 userSchema.index({ phone: 1 }, { sparse: true });
 

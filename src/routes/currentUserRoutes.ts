@@ -10,7 +10,7 @@ import {
   leaveCurrentUserFromServer,
   getCurrentUserPrivateChannels,
   createCurrentUserPrivateChannel
-} from '@/controllers/currentUserController';
+} from '@/controllers/currentUser/currentUser.controller';
 const route = express.Router();
 
 route.get('/', getCurrentUser); // Get Current User

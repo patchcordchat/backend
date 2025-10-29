@@ -24,13 +24,3 @@ export interface IServer extends Document {
   createdAt: Date;
   updatedAt: Date;
 }
-
-export interface createServerRequest {
-	name: string;
-	description?: string | null;
-	region?: string | null;
-	icon?: string | null;
-	afk_channel_id?: Schema.Types.UUID | null;
-	afk_timeout?: number | null;
-}
-

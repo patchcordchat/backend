@@ -25,15 +25,14 @@ const channelSchema = new Schema<IChannel>(
     name: {
       type: String,
       required: true,
+      minLength: 1,
+      maxLength: 100,
     },
     last_message_id: {
       type: Schema.Types.UUID,
-      required: false,
     },
     user_limit: {
       type: Number,
-      required: true,
-      default: 100,
     },
     owner_id: {
       type: Schema.Types.UUID,

@@ -10,7 +10,7 @@ import {
   joinServer,
   addServerMember,
   getServerRoles
-} from '@/controllers/serverController';
+} from '@/controllers/server/server.controller';
 const route = express.Router();
 
 route.get('/:id', getServer); // Get Server

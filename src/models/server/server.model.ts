@@ -14,7 +14,7 @@ const RoleSchema = new Schema<IRole>({
   },
   description: {
     type: String,
-    required: false,
+    maxLength: 300
   },
   hoist: {
     type: Boolean,
@@ -42,10 +42,11 @@ const serverSchema = new Schema<IServer>(
     name: {
       type: String,
       required: true,
+      minLength: 2,
+      maxLength: 100,
     },
     icon: {
       type: String,
-      required: false,
     },
     owner_id: {
       type: Schema.Types.UUID,
@@ -53,23 +54,25 @@ const serverSchema = new Schema<IServer>(
     },
     description: {
       type: String,
-      required: false,
+      maxLength: 300,
     },
     afk_channel_id: {
       type: Schema.Types.UUID,
-      required: false,
     },
     afk_timeout: {
       type: Number,
       default: 60,
+      enum: [60, 300, 900, 1800, 3600],
     },
     roles: [RoleSchema],
     max_members: {
       type: Number,
-      default: 100,
     },
   },
-  { timestamps: true, collection: 'servers' },
+  {
+    timestamps: true,
+    collection: 'servers',
+  },
 );
 
 // Добавление индексов

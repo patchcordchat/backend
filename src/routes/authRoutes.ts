@@ -10,7 +10,7 @@ import {
   forgotPassword,
   resetPassword,
   revertAccount,
-} from '@/controllers/authController';
+} from '@/controllers/auth/auth.controller';
 
 const route = express.Router();
 
