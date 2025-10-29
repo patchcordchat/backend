@@ -3,7 +3,7 @@ import { randomUUID } from 'crypto';
 
 export interface IChannel extends Document {
   _id: Schema.Types.UUID;
-  id: string;
+  id: Schema.Types.UUID;
   type: number;
   server_id: Schema.Types.UUID;
   position: number;

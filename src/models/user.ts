@@ -3,7 +3,7 @@ import { randomUUID } from 'crypto';
 
 export interface IUser extends Document {
   _id: Schema.Types.UUID;
-  id: string;
+  id: Schema.Types.UUID;
   username: string;
   global_name?: string;
   avatar?: string;

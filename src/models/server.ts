@@ -13,7 +13,7 @@ export interface IRole {
 
 export interface IServer extends Document {
   _id: Schema.Types.UUID,
-  id: string;
+  id: Schema.Types.UUID;
   name: string;
   icon?: string;
   owner_id: Schema.Types.UUID;

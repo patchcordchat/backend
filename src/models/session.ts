@@ -9,7 +9,6 @@ export interface AuthSessionClientInfo {
 }
 
 export interface ISession extends Document {
-  _id: Schema.Types.UUID;
   id_hash: string;
   user_id: string;
   refresh_token: string;
@@ -23,11 +22,6 @@ export interface ISession extends Document {
 
 const sessionSchema = new Schema<ISession>(
   {
-    _id: {
-      type: Schema.Types.UUID,
-      default: () => randomUUID(),
-      alias: 'id',
-    },
     id_hash: {
       type: String,
       required: true,
@@ -72,17 +66,10 @@ const sessionSchema = new Schema<ISession>(
       type: Date,
       required: true,
       index: true,
-    },
-    ip_address: {
-      type: String,
-      required: true,
-    },
-    user_agent: {
-      type: String,
-      required: true,
-    },
+    }
   },
   {
+    _id: false,
     timestamps: false,
     collection: 'sessions',
   },

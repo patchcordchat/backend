@@ -27,7 +27,7 @@ export interface IAuthor {
 
 export interface IMessage extends Document {
   _id: Schema.Types.UUID;
-  id: string;
+  id: Schema.Types.UUID;
   channel_id: Schema.Types.UUID;
   author: IAuthor;
   content: string;
