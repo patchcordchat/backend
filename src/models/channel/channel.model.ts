@@ -1,21 +1,6 @@
-import { Schema, model, type Document } from 'mongoose';
+import { Schema, model } from 'mongoose';
 import { randomUUID } from 'crypto';
-
-export interface IChannel extends Document {
-  _id: Schema.Types.UUID;
-  id: Schema.Types.UUID;
-  type: number;
-  server_id: Schema.Types.UUID;
-  position: number;
-  name: string;
-  last_message_id?: string;
-  user_limit: number;
-  owner_id: Schema.Types.UUID;
-  member_count: number;
-  flags: number;
-  createdAt: Date;
-  updatedAt: Date;
-}
+import { IChannel } from './channel.types';
 
 const channelSchema = new Schema<IChannel>(
   {

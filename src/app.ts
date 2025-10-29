@@ -5,6 +5,7 @@ import {
   serverRoutes,
   channelRoutes,
   currentUserRoutes,
+  authRoutes,
 } from '@/routes';
 
 const app = express();
@@ -24,6 +25,6 @@ app.use('/api/users', userRoutes);
 app.use('/api/users/@me', currentUserRoutes);
 app.use('/api/servers', serverRoutes);
 app.use('/api/channels', channelRoutes);
-app.use('/api/auth', )
+app.use('/api/auth', authRoutes);
 
 export default app;

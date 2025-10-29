@@ -1,30 +1,6 @@
-import { Schema, model, type Document } from 'mongoose';
+import { Schema, model } from 'mongoose';
 import { randomUUID } from 'crypto';
-
-export interface IRole {
-  _id: Schema.Types.UUID,
-  id: string;
-  name: string;
-  description?: string;
-  hoist: boolean;
-  position: number;
-  flags: number;
-}
-
-export interface IServer extends Document {
-  _id: Schema.Types.UUID,
-  id: Schema.Types.UUID;
-  name: string;
-  icon?: string;
-  owner_id: Schema.Types.UUID;
-  description?: string;
-  afk_channel_id?: string;
-  afk_timeout: number;
-  roles: IRole[];
-  max_members: number;
-  createdAt: Date;
-  updatedAt: Date;
-}
+import { type IServer, IRole } from './server.types';
 
 const RoleSchema = new Schema<IRole>({
   _id: {
