@@ -1,4 +1,5 @@
 import dotenv from 'dotenv';
+import {type ConnectOptions} from 'mongoose'
 
 dotenv.config();
 
@@ -7,12 +8,15 @@ interface Config {
   server: {
     port: number,
   }
-  mongodb: {
-    host: string,
-    login: string,
-    pass: string,
-    authdb: string,
-    database: string
+  database: {
+    mongodb: {
+      host: string,
+      port: string,
+      username: string,
+      password: string,
+      database: string,
+      options?: ConnectOptions | undefined
+    }
   }
 }
 
@@ -21,12 +25,14 @@ const config: Config = {
   server: {
     port: Number(process.env.PORT) || 3000,
   },
-  mongodb: {
-    host: process.env.MONGO_HOST || '192.168.0.53',
-    login: process.env.MONGO_USERNAME || 'patchcord',
-    pass: process.env.MONGO_PASSWORD || 'patchcord',
-    authdb: process.env.MONGO_AUTH_DATABASE || 'admin',
-    database: process.env.MONGO_DATABASE || 'patchcord',
+  database: {
+    mongodb: {
+      host: process.env.MONGO_HOST || '192.168.0.53',
+      port: process.env.MONGO_PORT || '27017',
+      username: process.env.MONGO_USERNAME || 'patchcord',
+      password: process.env.MONGO_PASSWORD || 'patchcord',
+      database: process.env.MONGO_DATABASE || 'patchcord',
+    }
   }
 };
 

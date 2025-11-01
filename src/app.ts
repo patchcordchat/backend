@@ -11,13 +11,11 @@ import {
 const app = express();
 const cors = require('cors');
 const morgan = require('morgan');
-const cookieParser = require('cookie-parser');
 
 // Middlewares
 app.use(errorHandler);
 app.use(cors());
 app.use(morgan('tiny'));
-app.use(cookieParser());
 app.use(express.json());
 
 // Routes
