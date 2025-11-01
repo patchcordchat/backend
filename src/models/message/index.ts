@@ -1,9 +1,5 @@
-import model from './message.model';
-import {
-  type IMessage,
-  type IReaction,
-  type IAttachment,
-  type IAuthor,
-} from './message.types';
+import Message from './message.model';
 
-export { model, IMessage, IReaction, IAttachment, IAuthor };
+export default Message;
+export * from './message.types';
+

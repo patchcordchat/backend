@@ -1,4 +1,4 @@
-import model from './channel.model';
-import { type IChannel } from './channel.types';
+import Channel from './channel.model';
 
-export { model, IChannel };
+export default Channel;
+export * from './channel.types';

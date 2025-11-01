@@ -1,6 +1,4 @@
-import model from './user.model';
-import {
-  type IUser,
-} from './user.types';
+import User from './user.model';
 
-export { model, IUser };
+export default User;
+export * from './user.types';

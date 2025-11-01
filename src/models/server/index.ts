@@ -1,7 +1,4 @@
-import model from './server.model';
-import {
-  type IServer,
-  type IRole,
-} from './server.types';
+import Server from './server.model';
 
-export { model, IServer, IRole };
+export default Server;
+export * from './server.types';
