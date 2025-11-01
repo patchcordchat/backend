@@ -1,5 +1,5 @@
 import express from 'express';
-import { errorHandler } from '@/middlewares/errorHandler';
+import { errorMiddleware } from '@/middlewares';
 import {
   userRoutes,
   serverRoutes,
@@ -13,7 +13,7 @@ const cors = require('cors');
 const morgan = require('morgan');
 
 // Middlewares
-app.use(errorHandler);
+app.use(errorMiddleware);
 app.use(cors());
 app.use(morgan('tiny'));
 app.use(express.json());
