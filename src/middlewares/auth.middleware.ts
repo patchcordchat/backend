@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { verify } from 'jsonwebtoken';
-import config from '@/config/config'
+import config from '@/config'
 import User, { IUser } from '@/models/user';
 
 export interface CustomRequest extends Request {
