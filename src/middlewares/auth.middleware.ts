@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { verify } from 'jsonwebtoken';
+import config from '@/config/config'
 import User, { IUser } from '@/models/user';
 
 export interface CustomRequest extends Request {
@@ -24,7 +25,7 @@ const authMiddleware = async (
 
     const decoded = verify(
       token,
-      process.env.JWT_KEY as string,
+      config.app.key,
     ) as DecodedToken;
     const user = await User.findOne({
       _id: decoded._id,

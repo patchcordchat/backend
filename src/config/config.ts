@@ -4,7 +4,10 @@ import {type ConnectOptions} from 'mongoose'
 dotenv.config();
 
 interface Config {
-  nodeEnv: string;
+  nodeEnv: string,
+  app: {
+    key: string,
+  }
   server: {
     port: number,
   }
@@ -22,16 +25,19 @@ interface Config {
 
 const config: Config = {
   nodeEnv: process.env.NODE_ENV || 'development',
+  app: {
+    key: process.env.APP_KEY || 'change-me',
+  },
   server: {
     port: Number(process.env.PORT) || 3000,
   },
   database: {
     mongodb: {
-      host: process.env.MONGO_HOST || '192.168.0.53',
+      host: process.env.MONGO_HOST || 'localhost',
       port: process.env.MONGO_PORT || '27017',
       username: process.env.MONGO_USERNAME || 'patchcord',
       password: process.env.MONGO_PASSWORD || 'patchcord',
-      database: process.env.MONGO_DATABASE || 'patchcord',
+      database: process.env.MONGO_DATABASE || 'change-me',
     }
   }
 };
