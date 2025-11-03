@@ -76,7 +76,5 @@ const userSchema = new Schema<IUser>(
 
 // Добавление индексов
 userSchema.index({ username: 'text', global_name: 'text' });
-userSchema.index({ email: 1 }, { sparse: true });
-userSchema.index({ phone: 1 }, { sparse: true });
 
 export default model<IUser>('user', userSchema);

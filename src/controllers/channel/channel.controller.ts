@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { model as Channel } from '@/models/channel';
+import Channel from '@/models/channel';
 
 export const getChannel = async (
   req: Request,
