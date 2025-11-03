@@ -1,0 +1,45 @@
+name: patchcord
+
+services:
+  # NodeJS Backend
+  patchcord:
+    container_name: patchcord
+    build:
+      context: ./
+    env_file: .env
+    ports:
+      - ${SERVER_PORT:-3000}:3000
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    restart: always
+    networks:
+      - backend
+    depends_on:
+      mongodb:
+        condition: service_healthy
+        
+  # MongoDB
+  mongodb:
+    container_name: mongodb
+    image: mongo:4.4
+    ports:
+      - ${MONGO_PORT}:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_DATABASE}
+    volumes:
+      - ./.data/db:/data/db
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.runCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+networks:
+    backend:
+        driver: bridge
