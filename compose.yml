@@ -6,12 +6,13 @@ services:
     container_name: patchcord
     build:
       context: ./
+    env_file: .env
     ports:
       - ${SERVER_PORT:-3000}:3000
     volumes:
-      - .:/app
-      - /app/node_modules
-    restart: "unless-stopped"
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    restart: always
     networks:
       - backend
     depends_on:
@@ -30,6 +31,8 @@ services:
       MONGO_INITDB_DATABASE: ${MONGO_DATABASE}
     volumes:
       - ./.data/db:/data/db
+    networks:
+      - backend
     healthcheck:
       test: ["CMD", "mongo", "--eval", "db.runCommand('ping').ok"]
       interval: 10s

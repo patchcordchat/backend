@@ -8,7 +8,7 @@ const { host, port, username, password, database, options } =
   config.database.mongodb;
 
 export async function connect(): Promise<void> {
-  const uri = `mongodb://${username}:${password}@${host}:${port}/${database}`;
+  const uri = `mongodb://${username}:${password}@${host}:${port}/${database}?authSource=admin`;
 
   try {
     await mongoose.connect(uri, options);
