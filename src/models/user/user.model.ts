@@ -1,13 +1,15 @@
 import { Schema, model } from 'mongoose';
 import { randomUUID } from 'crypto';
-import { IUser } from './user.types';
+import config from '@/config';
+import { hash, compare } from 'bcryptjs';
+import { IUser, UserModel, IUserMethods } from './user.types';
+import { sign } from 'jsonwebtoken';
 
-const userSchema = new Schema<IUser>(
+const userSchema = new Schema<IUser, UserModel, IUserMethods>(
   {
     _id: {
       type: Schema.Types.UUID,
       default: () => randomUUID(),
-      alias: 'id',
     },
     username: {
       type: String,
@@ -70,11 +72,64 @@ const userSchema = new Schema<IUser>(
       required: true,
       select: false,
     },
+    tokens: [{ token: { type: String, required: true } }],
   },
-  { timestamps: true, collection: 'users' },
+  {
+    timestamps: true,
+    collection: 'users',
+  },
 );
 
 // Добавление индексов
 userSchema.index({ username: 'text', global_name: 'text' });
 
-export default model<IUser>('user', userSchema);
+userSchema.pre('save', async function (next) {
+  if (this.isModified('password')) {
+    this.password = await hash(this.password, 8);
+  }
+  next();
+});
+
+userSchema.methods.generateAuthToken = async function () {
+  const user = this;
+  const token = sign({ _id: user._id.toString() }, config.app.key);
+  user.tokens = user.tokens.concat({ token });
+  await user.save();
+  return token;
+};
+
+userSchema.methods.toJSON = function () {
+  const user = this as IUser;
+  const userObject = user.toObject();
+  userObject.id = user._id.toString();
+  
+  [
+    '_id',
+    'flags',
+    'password',
+    'tokens',
+    '__v',
+    'createdAt',
+    'updatedAt',
+  ].forEach((field) => {
+    delete userObject[field];
+  });
+
+  return userObject;
+};
+
+userSchema.statics.findByCredentials = async (email, password) => {
+  const user = await User.findOne({ email }).select('+password');
+  if (!user) {
+    return null;
+  }
+  const isMatch = await compare(password, user.password);
+  if (!isMatch) {
+    return null;
+  }
+  return user;
+};
+
+const User = model<IUser, UserModel>('User', userSchema);
+
+export default User;
