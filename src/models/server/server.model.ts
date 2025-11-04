@@ -14,7 +14,7 @@ const RoleSchema = new Schema<IRole>({
   },
   description: {
     type: String,
-    maxLength: 300
+    maxLength: 300,
   },
   hoist: {
     type: Boolean,
@@ -74,6 +74,24 @@ const serverSchema = new Schema<IServer>(
     collection: 'servers',
   },
 );
+
+serverSchema.methods.toJSON = function () {
+  const server = this as IServer;
+  const serverObject = server.toObject();
+  serverObject.id = server._id.toString();
+  serverObject.owner_id = server.owner_id.toString();
+
+  [
+    '_id',
+    '__v',
+    'createdAt',
+    'updatedAt',
+  ].forEach((field) => {
+    delete serverObject[field];
+  });
+
+  return serverObject;
+};
 
 // Добавление индексов
 serverSchema.index({ name: 'text', description: 'text' });

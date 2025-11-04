@@ -8,29 +8,25 @@ export const login = async (
   res: Response,
   next: NextFunction,
 ) => {
-  try {
-    const userData: Partial<IUser> = {
-      email: req.body?.email,
-      password: req.body?.password,
-    };
-  
-    if (!userData.email || !userData.password) {
-      throw new ApiError('Please provide all the required fields', 400);
-    }
-  
-    const existingUser = await User.findByCredentials(
-      userData.email,
-      userData.password,
-    );
-    if (!existingUser) {
-      throw new ApiError('User not found', 404);
-    }
-  
-    const token = await existingUser.generateAuthToken();
-    res.json({ user: existingUser, token });
-  } catch (error) {
-    next(error)
+  const userData: Partial<IUser> = {
+    email: req.body?.email,
+    password: req.body?.password,
+  };
+
+  if (!userData.email || !userData.password) {
+    throw new ApiError('Please provide all the required fields', 400);
   }
+
+  const existingUser = await User.findByCredentials(
+    userData.email,
+    userData.password,
+  );
+  if (!existingUser) {
+    throw new ApiError('User not found', 404);
+  }
+
+  const token = await existingUser.generateAuthToken();
+  res.json({ user: existingUser, token });
 };
 
 export const register = async (
@@ -54,22 +50,18 @@ export const register = async (
     throw new ApiError('User with that email already exists.', 409);
   }
 
-  try {
-    const newUser = new User({
-      username: userData.username,
-      global_name: userData.global_name,
-      email: userData.email,
-      password: userData.password,
-    });
+  const newUser = new User({
+    username: userData.username,
+    global_name: userData.global_name,
+    email: userData.email,
+    password: userData.password,
+  });
 
-    await newUser.save();
+  await newUser.save();
 
-    const token = await newUser.generateAuthToken();
+  const token = await newUser.generateAuthToken();
 
-    res.json({ user: newUser, token });
-  } catch (err) {
-    next(err);
-  }
+  res.json({ user: newUser, token });
 };
 
 export const registerByPhone = async (
