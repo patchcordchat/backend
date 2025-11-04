@@ -12,8 +12,6 @@ const app = express();
 const cors = require('cors');
 const morgan = require('morgan');
 
-// Middlewares
-app.use(errorMiddleware);
 app.use(cors());
 app.use(morgan('tiny'));
 app.use(express.json());
@@ -24,5 +22,6 @@ app.use('/api/users/@me', currentUserRoutes);
 app.use('/api/servers', serverRoutes);
 app.use('/api/channels', channelRoutes);
 app.use('/api/auth', authRoutes);
+app.use(errorMiddleware);
 
 export default app;

@@ -1,33 +1,36 @@
 import { Request, Response, NextFunction } from 'express';
 import { CustomRequest } from '@/middlewares/auth.middleware';
+import { ApiError } from '@/middlewares/error.middleware';
 import User, { IUser } from '@/models/user';
 
 export const login = async (
   req: Request,
   res: Response,
   next: NextFunction,
-) => {  
-  const userData: Partial<IUser> = {
-    email: req.body.email,
-    password: req.body.password,
-  };
-
-  if (!userData.email || !userData.password) {
-    return {
-      error: 'Please provide all the required fields',
+) => {
+  try {
+    const userData: Partial<IUser> = {
+      email: req.body?.email,
+      password: req.body?.password,
     };
+  
+    if (!userData.email || !userData.password) {
+      throw new ApiError('Please provide all the required fields', 400);
+    }
+  
+    const existingUser = await User.findByCredentials(
+      userData.email,
+      userData.password,
+    );
+    if (!existingUser) {
+      throw new ApiError('User not found', 404);
+    }
+  
+    const token = await existingUser.generateAuthToken();
+    res.json({ user: existingUser, token });
+  } catch (error) {
+    next(error)
   }
-
-  const existingUser = await User.findByCredentials(
-    userData.email,
-    userData.password,
-  );
-  if (!existingUser) {
-    return null;
-  }
-
-  const token = await existingUser.generateAuthToken();
-  res.json({ user: existingUser, token });
 };
 
 export const register = async (
@@ -43,16 +46,12 @@ export const register = async (
   };
 
   if (!userData.username || !userData.email || !userData.password) {
-    return {
-      error: 'Please provide all the required fields',
-    };
+    throw new ApiError('Please provide all the required fields.', 400);
   }
 
   const existingUser = await User.findOne({ email: userData.email });
   if (existingUser) {
-    return {
-      error: 'User with that email already exists.',
-    };
+    throw new ApiError('User with that email already exists.', 409);
   }
 
   try {
@@ -105,7 +104,7 @@ export const logout = async (req: CustomRequest, res: Response) => {
     await req.user.save();
   }
 
-  return res.status(200).json({
+  return res.clearCookie('access_token').status(200).json({
     message: 'User logged out successfully.',
   });
 };
