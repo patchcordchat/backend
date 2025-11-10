@@ -4,8 +4,8 @@ import config from '@/config'
 import User, { IUser } from '@/models/user';
 
 export interface CustomRequest extends Request {
-  user: IUser;
-  token: string;
+  user?: IUser;
+  token?: string;
 }
 
 interface DecodedToken {

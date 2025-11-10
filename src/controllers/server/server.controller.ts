@@ -28,6 +28,10 @@ export const createServer = async (
   res: Response,
   next: NextFunction,
 ) => {
+  if (!req.user) {
+    throw new ApiError('Authentication failed. User not found.', 403);
+  }
+
   const serverData: Partial<IServer> = {
     name: req.body.name,
     description: req.body.description,

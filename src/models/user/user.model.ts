@@ -1,15 +1,15 @@
-import { Schema, model } from 'mongoose';
-import { randomUUID } from 'crypto';
-import config from '@/config';
+import { Schema, model, Types } from 'mongoose';
 import { hash, compare } from 'bcryptjs';
-import { IUser, UserModel, IUserMethods } from './user.types';
 import { sign } from 'jsonwebtoken';
+import config from '@/config';
+import { IUser, UserModel, IUserMethods } from './user.types';
+import { toJSONPlugin } from '../plugins/toJSON.plugin';
 
 const userSchema = new Schema<IUser, UserModel, IUserMethods>(
   {
     _id: {
-      type: Schema.Types.UUID,
-      default: () => randomUUID(),
+      type: Schema.Types.ObjectId,
+      default: () => new Types.ObjectId(),
     },
     username: {
       type: String,
@@ -60,7 +60,7 @@ const userSchema = new Schema<IUser, UserModel, IUserMethods>(
     flags: {
       type: Number,
       default: 0,
-      select: false,
+      private: true,
     },
     public_flags: {
       type: Number,
@@ -70,15 +70,20 @@ const userSchema = new Schema<IUser, UserModel, IUserMethods>(
     password: {
       type: String,
       required: true,
-      select: false,
+      private: true,
     },
-    tokens: [{ token: { type: String, required: true } }],
+    tokens: {
+      type: [{ token: { type: String, required: true } }],
+      private: true,
+    },
   },
   {
     timestamps: true,
     collection: 'users',
   },
 );
+
+userSchema.plugin(toJSONPlugin<IUser, UserModel, IUserMethods>());
 
 // Добавление индексов
 userSchema.index({ username: 'text', global_name: 'text' });
@@ -98,28 +103,8 @@ userSchema.methods.generateAuthToken = async function () {
   return token;
 };
 
-userSchema.methods.toJSON = function () {
-  const user = this as IUser;
-  const userObject = user.toObject();
-  userObject.id = user._id.toString();
-  
-  [
-    '_id',
-    'flags',
-    'password',
-    'tokens',
-    '__v',
-    'createdAt',
-    'updatedAt',
-  ].forEach((field) => {
-    delete userObject[field];
-  });
-
-  return userObject;
-};
-
 userSchema.statics.findByCredentials = async (email, password) => {
-  const user = await User.findOne({ email }).select('+password');
+  const user = await User.findOne({ email });
   if (!user) {
     return null;
   }

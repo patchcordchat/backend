@@ -1,17 +1,17 @@
-import { Schema, model } from 'mongoose';
-import { randomUUID } from 'crypto';
+import { Schema, model, Types } from 'mongoose';
 import {
   type IAttachment,
   IReaction,
   IAuthor,
   IMessage,
 } from './message.types';
+import { toJSONPlugin } from '../plugins/toJSON.plugin';
 
 const attachmentSchema = new Schema<IAttachment>(
   {
     id: {
-      type: Schema.Types.UUID,
-      default: () => randomUUID(),
+      type: Schema.Types.ObjectId,
+      default: () => new Types.ObjectId(),
     },
     filename: String,
     size: Number,
@@ -36,8 +36,8 @@ const reactionSchema = new Schema<IReaction>(
 const authorSchema = new Schema<IAuthor>(
   {
     id: {
-      type: Schema.Types.UUID,
-      required: true,
+      type: Schema.Types.ObjectId,
+      default: () => new Types.ObjectId(),
     },
     username: String,
     discriminator: String,
@@ -49,12 +49,11 @@ const authorSchema = new Schema<IAuthor>(
 const messageSchema = new Schema<IMessage>(
   {
     _id: {
-      type: Schema.Types.UUID,
-      default: () => randomUUID(),
-      alias: 'id',
+      type: Schema.Types.ObjectId,
+      default: () => new Types.ObjectId(),
     },
     channel_id: {
-      type: Schema.Types.UUID,
+      type: Schema.Types.ObjectId,
       required: true,
     },
     author: authorSchema,
@@ -92,6 +91,8 @@ const messageSchema = new Schema<IMessage>(
   },
   { timestamps: false, collection: 'messages' },
 );
+
+messageSchema.plugin(toJSONPlugin<IMessage>);
 
 // Добавление индексов
 messageSchema.index({ channel_id: 1, timestamp: -1 });
