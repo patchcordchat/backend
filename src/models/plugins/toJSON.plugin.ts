@@ -76,7 +76,6 @@ export function toJSONPlugin<
           Record<string, any>,
           ToObjectOptions,
         ];
-        console.log(ret);
         removePrivatePaths(ret, schema);
         removeVersion(ret);
         normalizeId(ret);
