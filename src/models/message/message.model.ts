@@ -99,4 +99,4 @@ messageSchema.index({ channel_id: 1, timestamp: -1 });
 messageSchema.index({ timestamp: -1 });
 messageSchema.index({ content: 'text' });
 
-export default model<IMessage>('message', messageSchema);
+export default model<IMessage>('Message', messageSchema);

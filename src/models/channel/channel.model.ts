@@ -56,4 +56,4 @@ channelSchema.plugin(toJSONPlugin<IChannel>);
 // Добавление индексов
 channelSchema.index({ server_id: 1, position: 1 });
 
-export default model<IChannel>('channel', channelSchema);
+export default model<IChannel>('Channel', channelSchema);

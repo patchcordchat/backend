@@ -78,4 +78,4 @@ serverSchema.plugin(toJSONPlugin<IServer>());
 // Добавление индексов
 serverSchema.index({ name: 'text', description: 'text' });
 
-export default model<IServer>('server', serverSchema);
+export default model<IServer>('Server', serverSchema);
