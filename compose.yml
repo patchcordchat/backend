@@ -2,16 +2,14 @@ name: patchcord
 
 services:
   # NodeJS Backend
-  patchcord:
-    container_name: patchcord
-    build:
-      context: ./
-    env_file: .env
+  api:
+    container_name: api
+    build: ./
     ports:
       - ${SERVER_PORT:-3000}:3000
     volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
+      - .:/app
+      - ./node_modules:/app/node_modules
     restart: always
     networks:
       - backend
