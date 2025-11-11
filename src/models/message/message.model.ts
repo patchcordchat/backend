@@ -1,47 +1,12 @@
 import { Schema, model, Types } from 'mongoose';
-import {
-  type IAttachment,
-  IReaction,
-  IAuthor,
-  IMessage,
-} from './message.types';
+import type { IReaction, IMessage } from './message.types';
 import { toJSONPlugin } from '../plugins/toJSON.plugin';
-
-const attachmentSchema = new Schema<IAttachment>(
-  {
-    id: {
-      type: Schema.Types.ObjectId,
-      default: () => new Types.ObjectId(),
-    },
-    filename: String,
-    size: Number,
-    url: String,
-    proxy_url: String,
-    height: Number,
-    width: Number,
-    content_type: String,
-  },
-  { _id: false },
-);
 
 const reactionSchema = new Schema<IReaction>(
   {
     emoji: String,
     count: Number,
     users: [Schema.Types.UUID],
-  },
-  { _id: false },
-);
-
-const authorSchema = new Schema<IAuthor>(
-  {
-    id: {
-      type: Schema.Types.ObjectId,
-      default: () => new Types.ObjectId(),
-    },
-    username: String,
-    discriminator: String,
-    avatar: String,
   },
   { _id: false },
 );
@@ -56,7 +21,11 @@ const messageSchema = new Schema<IMessage>(
       type: Schema.Types.ObjectId,
       required: true,
     },
-    author: authorSchema,
+    author: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
     content: {
       type: String,
       required: true,
@@ -74,7 +43,10 @@ const messageSchema = new Schema<IMessage>(
       type: Boolean,
       default: false,
     },
-    attachments: [attachmentSchema],
+    attachments: [{
+      type: Schema.Types.ObjectId,
+      ref: 'File',
+    }],
     reactions: [reactionSchema],
     pinned: {
       type: Boolean,
