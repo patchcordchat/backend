@@ -1,12 +1,11 @@
-import { Schema, model } from 'mongoose';
-import { randomUUID } from 'crypto';
+import { Schema, model, Types } from 'mongoose';
 import { type IServer, IRole } from './server.types';
+import { toJSONPlugin } from '../plugins/toJSON.plugin';
 
 const RoleSchema = new Schema<IRole>({
   _id: {
-    type: Schema.Types.UUID,
-    default: () => randomUUID(),
-    alias: 'id',
+    type: Schema.Types.ObjectId,
+    default: () => new Types.ObjectId(),
   },
   name: {
     type: String,
@@ -35,9 +34,8 @@ const RoleSchema = new Schema<IRole>({
 const serverSchema = new Schema<IServer>(
   {
     _id: {
-      type: Schema.Types.UUID,
-      default: () => randomUUID(),
-      alias: 'id',
+      type: Schema.Types.ObjectId,
+      default: () => new Types.ObjectId(),
     },
     name: {
       type: String,
@@ -49,7 +47,7 @@ const serverSchema = new Schema<IServer>(
       type: String,
     },
     owner_id: {
-      type: Schema.Types.UUID,
+      type: Schema.Types.ObjectId,
       required: true,
     },
     description: {
@@ -57,7 +55,7 @@ const serverSchema = new Schema<IServer>(
       maxLength: 300,
     },
     afk_channel_id: {
-      type: Schema.Types.UUID,
+      type: Schema.Types.ObjectId,
     },
     afk_timeout: {
       type: Number,
@@ -75,25 +73,9 @@ const serverSchema = new Schema<IServer>(
   },
 );
 
-serverSchema.methods.toJSON = function () {
-  const server = this as IServer;
-  const serverObject = server.toObject();
-  serverObject.id = server._id.toString();
-  serverObject.owner_id = server.owner_id.toString();
-
-  [
-    '_id',
-    '__v',
-    'createdAt',
-    'updatedAt',
-  ].forEach((field) => {
-    delete serverObject[field];
-  });
-
-  return serverObject;
-};
+serverSchema.plugin(toJSONPlugin<IServer>());
 
 // Добавление индексов
 serverSchema.index({ name: 'text', description: 'text' });
 
-export default model<IServer>('server', serverSchema);
+export default model<IServer>('Server', serverSchema);

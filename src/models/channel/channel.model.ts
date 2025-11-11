@@ -1,13 +1,12 @@
-import { Schema, model } from 'mongoose';
-import { randomUUID } from 'crypto';
+import { Schema, model, Types } from 'mongoose';
 import { IChannel } from './channel.types';
+import { toJSONPlugin } from '../plugins/toJSON.plugin';
 
 const channelSchema = new Schema<IChannel>(
   {
     _id: {
-      type: Schema.Types.UUID,
-      default: () => randomUUID(),
-      alias: 'id',
+      type: Schema.Types.ObjectId,
+      default: () => new Types.ObjectId(),
     },
     type: {
       type: Number,
@@ -15,7 +14,7 @@ const channelSchema = new Schema<IChannel>(
       default: 0,
     },
     server_id: {
-      type: Schema.Types.UUID,
+      type: Schema.Types.ObjectId,
       required: true,
     },
     position: {
@@ -29,13 +28,13 @@ const channelSchema = new Schema<IChannel>(
       maxLength: 100,
     },
     last_message_id: {
-      type: Schema.Types.UUID,
+      type: Schema.Types.ObjectId,
     },
     user_limit: {
       type: Number,
     },
     owner_id: {
-      type: Schema.Types.UUID,
+      type: Schema.Types.ObjectId,
       required: true,
     },
     member_count: {
@@ -52,7 +51,9 @@ const channelSchema = new Schema<IChannel>(
   { timestamps: true, collection: 'channels' },
 );
 
+channelSchema.plugin(toJSONPlugin<IChannel>);
+
 // Добавление индексов
 channelSchema.index({ server_id: 1, position: 1 });
 
-export default model<IChannel>('channel', channelSchema);
+export default model<IChannel>('Channel', channelSchema);

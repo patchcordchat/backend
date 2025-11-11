@@ -1,28 +1,6 @@
-import { Schema, model } from 'mongoose';
-import { randomUUID } from 'crypto';
-import {
-  type IAttachment,
-  IReaction,
-  IAuthor,
-  IMessage,
-} from './message.types';
-
-const attachmentSchema = new Schema<IAttachment>(
-  {
-    id: {
-      type: Schema.Types.UUID,
-      default: () => randomUUID(),
-    },
-    filename: String,
-    size: Number,
-    url: String,
-    proxy_url: String,
-    height: Number,
-    width: Number,
-    content_type: String,
-  },
-  { _id: false },
-);
+import { Schema, model, Types } from 'mongoose';
+import type { IReaction, IMessage } from './message.types';
+import { toJSONPlugin } from '../plugins/toJSON.plugin';
 
 const reactionSchema = new Schema<IReaction>(
   {
@@ -33,31 +11,21 @@ const reactionSchema = new Schema<IReaction>(
   { _id: false },
 );
 
-const authorSchema = new Schema<IAuthor>(
-  {
-    id: {
-      type: Schema.Types.UUID,
-      required: true,
-    },
-    username: String,
-    discriminator: String,
-    avatar: String,
-  },
-  { _id: false },
-);
-
 const messageSchema = new Schema<IMessage>(
   {
     _id: {
-      type: Schema.Types.UUID,
-      default: () => randomUUID(),
-      alias: 'id',
+      type: Schema.Types.ObjectId,
+      default: () => new Types.ObjectId(),
     },
     channel_id: {
-      type: Schema.Types.UUID,
+      type: Schema.Types.ObjectId,
       required: true,
     },
-    author: authorSchema,
+    author: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
     content: {
       type: String,
       required: true,
@@ -75,7 +43,10 @@ const messageSchema = new Schema<IMessage>(
       type: Boolean,
       default: false,
     },
-    attachments: [attachmentSchema],
+    attachments: [{
+      type: Schema.Types.ObjectId,
+      ref: 'File',
+    }],
     reactions: [reactionSchema],
     pinned: {
       type: Boolean,
@@ -93,9 +64,11 @@ const messageSchema = new Schema<IMessage>(
   { timestamps: false, collection: 'messages' },
 );
 
+messageSchema.plugin(toJSONPlugin<IMessage>);
+
 // Добавление индексов
 messageSchema.index({ channel_id: 1, timestamp: -1 });
 messageSchema.index({ timestamp: -1 });
 messageSchema.index({ content: 'text' });
 
-export default model<IMessage>('message', messageSchema);
+export default model<IMessage>('Message', messageSchema);
