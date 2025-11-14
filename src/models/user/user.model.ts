@@ -2,7 +2,7 @@ import { Schema, model, Types } from 'mongoose';
 import { hash, compare } from 'bcryptjs';
 import { sign } from 'jsonwebtoken';
 import config from '@/config';
-import { IUser, UserModel, IUserMethods } from './user.types';
+import { IUser, UserModel, IUserMethods, UserFlags, UserPublicFlags } from './user.types';
 import { toJSONPlugin } from '../plugins/toJSON.plugin';
 
 const userSchema = new Schema<IUser, UserModel, IUserMethods>(
@@ -28,6 +28,7 @@ const userSchema = new Schema<IUser, UserModel, IUserMethods>(
     },
     bot: {
       type: Boolean,
+      default: false,
     },
     pronouns: {
       type: String,
@@ -37,10 +38,6 @@ const userSchema = new Schema<IUser, UserModel, IUserMethods>(
       type: String,
       default: '',
       maxLength: 190,
-    },
-    locale: {
-      type: String,
-      default: 'RU',
     },
     verified: {
       type: Boolean,
@@ -59,13 +56,13 @@ const userSchema = new Schema<IUser, UserModel, IUserMethods>(
     },
     flags: {
       type: Number,
-      default: 0,
+      default: UserFlags.NONE,
       private: true,
     },
     public_flags: {
       type: Number,
+      default: UserFlags.NONE,
       required: true,
-      default: 0,
     },
     password: {
       type: String,

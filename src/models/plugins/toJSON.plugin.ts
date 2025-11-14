@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document, Types, ToObjectOptions } from 'mongoose';
+import { Schema, Document, ToObjectOptions } from 'mongoose';
 
 export function normalizeId(ret: Record<string, any>) {
   if (ret._id && typeof ret._id === 'object' && ret._id.toString) {
