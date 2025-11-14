@@ -1,5 +1,5 @@
 import { Schema, model, Types } from 'mongoose';
-import { IChannel } from './channel.types';
+import { IChannel, ChannelTypes, ChannelFlags } from './channel.types';
 import { toJSONPlugin } from '../plugins/toJSON.plugin';
 
 const channelSchema = new Schema<IChannel>(
@@ -11,7 +11,7 @@ const channelSchema = new Schema<IChannel>(
     type: {
       type: Number,
       required: true,
-      default: 0,
+      default: ChannelTypes.TEXT,
     },
     server_id: {
       type: Schema.Types.ObjectId,
@@ -45,7 +45,7 @@ const channelSchema = new Schema<IChannel>(
     flags: {
       type: Number,
       required: true,
-      default: 0,
+      default: ChannelFlags.NONE,
     },
   },
   { timestamps: true, collection: 'channels' },

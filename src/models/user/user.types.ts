@@ -1,15 +1,14 @@
 import { Schema, type Document, Model, HydratedDocument } from 'mongoose';
 
 export interface IUser extends Document {
-  _id: Schema.Types.UUID;
-  id: Schema.Types.UUID;
+  _id: Schema.Types.ObjectId;
+  id: Schema.Types.ObjectId;
   username: string;
   global_name?: string;
   avatar?: string;
   bot?: boolean;
   pronouns?: string;
   bio: string;
-  locale: string;
   verified: boolean;
   email?: string;
   phone?: string;
@@ -19,6 +18,18 @@ export interface IUser extends Document {
   tokens: { token: string }[];
   createdAt: Date;
   updatedAt: Date;
+}
+
+export enum UserFlags {
+  NONE = 0,
+  DELETED = 1 << 0,
+  SELF_DELETED = 1 << 1,
+  DISABLED = 1 << 2,
+}
+
+export enum UserPublicFlags {
+  STAFF = 1 << 3,
+  SPAMMER = 1 << 4,
 }
 
 export interface IUserMethods {

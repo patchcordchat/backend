@@ -1,35 +1,6 @@
 import { Schema, model, Types } from 'mongoose';
-import { type IServer, IRole } from './server.types';
+import { type IServer } from './server.types';
 import { toJSONPlugin } from '../plugins/toJSON.plugin';
-
-const RoleSchema = new Schema<IRole>({
-  _id: {
-    type: Schema.Types.ObjectId,
-    default: () => new Types.ObjectId(),
-  },
-  name: {
-    type: String,
-    required: true,
-  },
-  description: {
-    type: String,
-    maxLength: 300,
-  },
-  hoist: {
-    type: Boolean,
-    required: true,
-    default: false,
-  },
-  position: {
-    type: Number,
-    required: true,
-  },
-  flags: {
-    type: Number,
-    required: true,
-    default: 0,
-  },
-});
 
 const serverSchema = new Schema<IServer>(
   {
@@ -48,7 +19,7 @@ const serverSchema = new Schema<IServer>(
     },
     owner_id: {
       type: Schema.Types.ObjectId,
-      required: true,
+      ref: 'User',
     },
     description: {
       type: String,
@@ -56,13 +27,13 @@ const serverSchema = new Schema<IServer>(
     },
     afk_channel_id: {
       type: Schema.Types.ObjectId,
+      ref: 'Channel',
     },
     afk_timeout: {
       type: Number,
       default: 60,
       enum: [60, 300, 900, 1800, 3600],
     },
-    roles: [RoleSchema],
     max_members: {
       type: Number,
     },

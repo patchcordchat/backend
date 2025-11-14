@@ -1,5 +1,6 @@
 import { Schema, model, Types } from 'mongoose';
 import type { IReaction, IMessage } from './message.types';
+import { MessageTypes } from './message.types';
 import { toJSONPlugin } from '../plugins/toJSON.plugin';
 
 const reactionSchema = new Schema<IReaction>(
@@ -19,6 +20,7 @@ const messageSchema = new Schema<IMessage>(
     },
     channel_id: {
       type: Schema.Types.ObjectId,
+      ref: 'Channel',
       required: true,
     },
     author: {
@@ -54,7 +56,8 @@ const messageSchema = new Schema<IMessage>(
     },
     type: {
       type: Number,
-      default: 0,
+      default: MessageTypes.DEFAULT,
+      required: true,
     },
     flags: {
       type: Number,
