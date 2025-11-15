@@ -1,12 +1,23 @@
+import { createServer, type Server } from 'http';
 import app from '@/app';
 import config from '@/config';
 
 (async function run() {
-  // Mongoose
-  await require('@/lib/mongoose').connect();
+  try {
+    // Mongoose
+    await require('@/lib/mongoose').connect();
 
-  // Server
-  app.listen(config.server.port, () => {
-    console.log(`Server running on port ${config.server.port}`);
-  });
+    // Server
+    const server: Server = createServer(app);
+
+    // Socket
+    require('@/socket').initialize(server);
+    
+    server.listen(config.server.port, () => {
+      console.log(`Server running on port ${config.server.port}`);
+    });
+  } catch (error) {
+    console.error('Failed to start server:', error);
+    process.exit(1);
+  }
 })();
