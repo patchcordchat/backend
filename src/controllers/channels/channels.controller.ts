@@ -67,3 +67,27 @@ export const deleteChannel = async (
     next(error);
   }
 };
+
+export const getMyPrivateChannels = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    res.json({ message: 'Success' });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const createMyPrivateChannel = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    res.json({ message: 'Success' });
+  } catch (error) {
+    next(error);
+  }
+};

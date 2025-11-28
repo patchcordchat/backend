@@ -5,7 +5,6 @@ import {
   userRoutes,
   serverRoutes,
   channelRoutes,
-  currentUserRoutes,
   authRoutes,
 } from '@/routes';
 
@@ -21,7 +20,6 @@ app.use(cookieParser(config.app.key));
 
 // Routes
 app.use('/api/users', userRoutes);
-app.use('/api/users/@me', currentUserRoutes);
 app.use('/api/servers', serverRoutes);
 app.use('/api/channels', channelRoutes);
 app.use('/api/auth', authRoutes);

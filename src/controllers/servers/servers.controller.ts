@@ -179,3 +179,27 @@ export const getServerRoles = (
     next(error);
   }
 };
+
+export const getMyServers = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    res.json({ message: 'Success' });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const leaveFromServer = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    res.json({ message: 'Success' });
+  } catch (error) {
+    next(error);
+  }
+};
