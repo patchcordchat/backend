@@ -1,6 +1,6 @@
-import userRoutes from './user.routes';
-import serverRoutes from './server.routes';
-import channelRoutes from './channel.routes';
+import userRoutes from './users.routes';
+import serverRoutes from './servers.routes';
+import channelRoutes from './channels.routes';
 import currentUserRoutes from './current-user.routes';
 import authRoutes from './auth.routes';
 
