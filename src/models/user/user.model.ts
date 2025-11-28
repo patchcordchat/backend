@@ -1,8 +1,12 @@
 import { Schema, model, Types } from 'mongoose';
 import { hash, compare } from 'bcryptjs';
-import { sign } from 'jsonwebtoken';
-import config from '@/config';
-import { IUser, UserModel, IUserMethods, UserFlags, UserPublicFlags } from './user.types';
+import {
+  IUser,
+  UserModel,
+  IUserMethods,
+  UserFlags,
+  UserPublicFlags,
+} from './user.types';
 import { toJSONPlugin } from '../plugins/toJSON.plugin';
 
 const userSchema = new Schema<IUser, UserModel, IUserMethods>(
@@ -61,16 +65,12 @@ const userSchema = new Schema<IUser, UserModel, IUserMethods>(
     },
     public_flags: {
       type: Number,
-      default: UserFlags.NONE,
+      default: UserPublicFlags.NONE,
       required: true,
     },
     password: {
       type: String,
       required: true,
-      private: true,
-    },
-    tokens: {
-      type: [{ token: { type: String, required: true } }],
       private: true,
     },
   },
@@ -92,23 +92,11 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
-userSchema.methods.generateAuthToken = async function () {
-  const user = this;
-  const token = sign({ _id: user._id.toString() }, config.app.key);
-  user.tokens = user.tokens.concat({ token });
-  await user.save();
-  return token;
-};
-
 userSchema.statics.findByCredentials = async (email, password) => {
   const user = await User.findOne({ email });
-  if (!user) {
-    return null;
-  }
+  if (!user) return null;
   const isMatch = await compare(password, user.password);
-  if (!isMatch) {
-    return null;
-  }
+  if (!isMatch) return null;
   return user;
 };
 
