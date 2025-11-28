@@ -1,10 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 
-export const getMe = (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+export const getMe = (req: Request, res: Response, next: NextFunction) => {
   try {
     res.json({ message: 'Success' });
   } catch (error) {
@@ -12,11 +8,7 @@ export const getMe = (
   }
 };
 
-export const updateMe = (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+export const updateMe = (req: Request, res: Response, next: NextFunction) => {
   try {
     res.json({ message: 'Success' });
   } catch (error) {

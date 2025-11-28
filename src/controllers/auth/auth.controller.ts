@@ -4,16 +4,24 @@ import { AuthService } from '@/services/auth.service';
 import { ApiError } from '@/middlewares/error.middleware';
 import User from '@/models/user';
 
-const setSessionCookie = (res: Response, sessionId: string, expiresAt: Date) => {
+const setSessionCookie = (
+  res: Response,
+  sessionId: string,
+  expiresAt: Date,
+) => {
   res.cookie('sid', sessionId, {
     httpOnly: true,
     signed: true,
     expires: expiresAt,
-    sameSite: 'lax', 
+    sameSite: 'lax',
   });
 };
 
-export const login = async (req: Request, res: Response, next: NextFunction) => {
+export const login = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const { email, password } = req.body;
     if (!email || !password) throw new ApiError('Missing fields', 400);
@@ -24,24 +32,28 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     // Создаем сессию
     const ip = req.ip || req.socket.remoteAddress || '';
     const userAgent = req.headers['user-agent'] || '';
-    
+
     const { sessionId, expiresAt } = await AuthService.createSession(
-        user._id.toString(), 
-        ip, 
-        userAgent
+      user._id.toString(),
+      ip,
+      userAgent,
     );
 
     // Ставим куку
     setSessionCookie(res, sessionId, expiresAt);
 
     // Возвращаем юзера (без токена в теле ответа, он теперь в httpOnly куке)
-    res.json({ user });
+    res.json(user);
   } catch (e) {
     next(e);
   }
 };
 
-export const register = async (req: Request, res: Response, next: NextFunction) => {
+export const register = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const existingUser = await User.findOne({ email: req.body.email });
     if (existingUser) throw new ApiError('Email exists', 409);
@@ -53,25 +65,29 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
     const ip = req.ip || '';
     const userAgent = req.headers['user-agent'] || '';
     const { sessionId, expiresAt } = await AuthService.createSession(
-        newUser._id.toString(), 
-        ip, 
-        userAgent
+      newUser._id.toString(),
+      ip,
+      userAgent,
     );
 
     setSessionCookie(res, sessionId, expiresAt);
 
-    res.status(201).json({ user: newUser });
+    res.status(201).json(newUser);
   } catch (e) {
     next(e);
   }
 };
 
-export const logout = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const logout = async (
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     if (req.sessionId) {
       await AuthService.deleteSession(req.sessionId);
     }
-    
+
     res.clearCookie('sid');
     res.status(200).json({ message: 'Logged out successfully' });
   } catch (e) {

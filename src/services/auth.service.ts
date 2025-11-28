@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import Session, {type ISession } from '@/models/session';
+import Session, { type ISession } from '@/models/session';
 import redis from '@/lib/ioredis';
 
 const SESSION_TTL = 24 * 60 * 60 * 1000; // 24 часа в миллисекундах
@@ -30,7 +30,7 @@ export class AuthService {
       `session:${sessionId}`,
       JSON.stringify(session),
       'EX',
-      REDIS_TTL_SECONDS
+      REDIS_TTL_SECONDS,
     );
 
     return { sessionId, expiresAt };
@@ -46,17 +46,16 @@ export class AuthService {
     const cachedSession = await redis.get(redisKey);
     if (cachedSession) {
       const session = JSON.parse(cachedSession) as ISession;
-      
-      // ИСПРАВЛЕНИЕ: Преобразуем строковые поля даты обратно в объекты Date
+
       session.expiresAt = new Date(session.expiresAt as unknown as string);
       session.lastActive = new Date(session.lastActive as unknown as string);
-      
+
       return session;
     }
 
     // 2. Если нет в Redis, ищем в MongoDB
     const session = await Session.findOne({ sessionId });
-    
+
     if (session) {
       // Проверяем, не истекла ли она
       if (session.expiresAt.getTime() < Date.now()) {
@@ -81,33 +80,33 @@ export class AuthService {
    */
   static async refreshSession(sessionId: string, session: ISession) {
     const now = Date.now();
-    // Продлеваем, только если прошло, например, 1 час с последнего обновления
+    // Продлеваем, только если прошёл 1 час с последнего обновления
     const ONE_HOUR = 60 * 60 * 1000;
 
-    console.log(session)
-    
-    if (session.expiresAt.getTime() - now < (SESSION_TTL - ONE_HOUR)) {
-        const newExpiresAt = new Date(now + SESSION_TTL);
-        
-        // Обновляем в Mongo
-        await Session.updateOne(
-            { sessionId }, 
-            { expiresAt: newExpiresAt, lastActive: new Date() }
-        );
-        
-        // Обновляем объект в памяти для Redis
-        session.expiresAt = newExpiresAt;
-        session.lastActive = new Date();
+    console.log(session);
 
-        // Обновляем в Redis
-        await redis.set(
-            `session:${sessionId}`,
-            JSON.stringify(session),
-            'EX',
-            REDIS_TTL_SECONDS
-        );
-        
-        return newExpiresAt; // Возвращаем новую дату для обновления куки
+    if (session.expiresAt.getTime() - now < SESSION_TTL - ONE_HOUR) {
+      const newExpiresAt = new Date(now + SESSION_TTL);
+
+      // Обновляем в Mongo
+      await Session.updateOne(
+        { sessionId },
+        { expiresAt: newExpiresAt, lastActive: new Date() },
+      );
+
+      // Обновляем объект в памяти для Redis
+      session.expiresAt = newExpiresAt;
+      session.lastActive = new Date();
+
+      // Обновляем в Redis
+      await redis.set(
+        `session:${sessionId}`,
+        JSON.stringify(session),
+        'EX',
+        REDIS_TTL_SECONDS,
+      );
+
+      return newExpiresAt; // Возвращаем новую дату для обновления куки
     }
     return null; // Обновление не требуется
   }

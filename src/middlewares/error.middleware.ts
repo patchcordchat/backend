@@ -2,8 +2,8 @@ import { Request, Response, NextFunction } from 'express';
 
 export class ApiError extends Error {
   constructor(
-    message?: string, 
-    public status?: number
+    message?: string,
+    public status?: number,
   ) {
     super(message);
     this.status = status;
@@ -21,7 +21,7 @@ const errorMiddleware = (
   res.status(err.status || 500).json({
     error: {
       message: err.message || 'Internal Server Error',
-    }
+    },
   });
 };
 

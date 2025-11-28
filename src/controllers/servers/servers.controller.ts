@@ -104,8 +104,8 @@ export const deleteServer = async (
   }
 
   try {
-    await Server.deleteOne({_id: id});
-    
+    await Server.deleteOne({ _id: id });
+
     res.json({ message: 'Success' });
   } catch (error) {
     next(error);
