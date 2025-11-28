@@ -28,6 +28,7 @@ export enum UserFlags {
 }
 
 export enum UserPublicFlags {
+  NONE = 0,
   STAFF = 1 << 3,
   SPAMMER = 1 << 4,
 }

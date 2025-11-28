@@ -1,67 +1,82 @@
 import { Request, Response, NextFunction } from 'express';
 import { CustomRequest } from '@/middlewares/auth.middleware';
+import { AuthService } from '@/services/auth.service';
 import { ApiError } from '@/middlewares/error.middleware';
-import User, { IUser } from '@/models/user';
+import User from '@/models/user';
 
-export const login = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  const userData: Partial<IUser> = {
-    email: req.body?.email,
-    password: req.body?.password,
-  };
-
-  if (!userData.email || !userData.password) {
-    throw new ApiError('Please provide all the required fields', 400);
-  }
-
-  const existingUser = await User.findByCredentials(
-    userData.email,
-    userData.password,
-  );
-  if (!existingUser) {
-    throw new ApiError('User not found', 404);
-  }
-
-  const token = await existingUser.generateAuthToken();
-  res.json({ user: existingUser, token });
+const setSessionCookie = (res: Response, sessionId: string, expiresAt: Date) => {
+  res.cookie('sid', sessionId, {
+    httpOnly: true,
+    signed: true,
+    expires: expiresAt,
+    sameSite: 'lax', 
+  });
 };
 
-export const register = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  const userData: Partial<IUser> = {
-    username: req.body.username,
-    global_name: req.body.global_name,
-    email: req.body.email,
-    password: req.body.password,
-  };
+export const login = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) throw new ApiError('Missing fields', 400);
 
-  if (!userData.username || !userData.email || !userData.password) {
-    throw new ApiError('Please provide all the required fields.', 400);
+    const user = await User.findByCredentials(email, password);
+    if (!user) throw new ApiError('Invalid credentials', 401);
+
+    // Создаем сессию
+    const ip = req.ip || req.socket.remoteAddress || '';
+    const userAgent = req.headers['user-agent'] || '';
+    
+    const { sessionId, expiresAt } = await AuthService.createSession(
+        user._id.toString(), 
+        ip, 
+        userAgent
+    );
+
+    // Ставим куку
+    setSessionCookie(res, sessionId, expiresAt);
+
+    // Возвращаем юзера (без токена в теле ответа, он теперь в httpOnly куке)
+    res.json({ user });
+  } catch (e) {
+    next(e);
   }
+};
 
-  const existingUser = await User.findOne({ email: userData.email });
-  if (existingUser) {
-    throw new ApiError('User with that email already exists.', 409);
+export const register = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const existingUser = await User.findOne({ email: req.body.email });
+    if (existingUser) throw new ApiError('Email exists', 409);
+
+    const newUser = new User(req.body);
+    await newUser.save();
+
+    // Сразу логиним после регистрации
+    const ip = req.ip || '';
+    const userAgent = req.headers['user-agent'] || '';
+    const { sessionId, expiresAt } = await AuthService.createSession(
+        newUser._id.toString(), 
+        ip, 
+        userAgent
+    );
+
+    setSessionCookie(res, sessionId, expiresAt);
+
+    res.status(201).json({ user: newUser });
+  } catch (e) {
+    next(e);
   }
+};
 
-  const newUser = new User({
-    username: userData.username,
-    global_name: userData.global_name,
-    email: userData.email,
-    password: userData.password,
-  });
-
-  await newUser.save();
-
-  const token = await newUser.generateAuthToken();
-
-  res.json({ user: newUser, token });
+export const logout = async (req: CustomRequest, res: Response, next: NextFunction) => {
+  try {
+    if (req.sessionId) {
+      await AuthService.deleteSession(req.sessionId);
+    }
+    
+    res.clearCookie('sid');
+    res.status(200).json({ message: 'Logged out successfully' });
+  } catch (e) {
+    next(e);
+  }
 };
 
 export const registerByPhone = async (
@@ -86,19 +101,6 @@ export const validatePasswordStrength = async (
   } catch (error) {
     next(error);
   }
-};
-
-export const logout = async (req: CustomRequest, res: Response) => {
-  if (req.user) {
-    req.user.tokens = req.user.tokens.filter((token) => {
-      return token.token !== req.token;
-    });
-    await req.user.save();
-  }
-
-  return res.clearCookie('access_token').status(200).json({
-    message: 'User logged out successfully.',
-  });
 };
 
 export const forgotPassword = async (

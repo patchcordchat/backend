@@ -1,15 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
-import { verify } from 'jsonwebtoken';
-import config from '@/config'
+import { AuthService } from '@/services/auth.service';
 import User, { IUser } from '@/models/user';
 
 export interface CustomRequest extends Request {
   user?: IUser;
-  token?: string;
-}
-
-interface DecodedToken {
-  _id: string;
+  sessionId?: string;
 }
 
 const authMiddleware = async (
@@ -18,29 +13,44 @@ const authMiddleware = async (
   next: NextFunction,
 ) => {
   try {
-    const token = req.header('Authorization')?.replace('Bearer ', '');
-    if (!token) {
-      throw new Error('Authentication failed: Token missing.');
+    // 1. Получаем sessionId из подписанной куки
+    const sessionId = req.signedCookies['sid'] || req.cookies['sid'];
+
+    if (!sessionId) {
+      throw new Error('Authentication failed: Session missing');
     }
 
-    const decoded = verify(
-      token,
-      config.app.key,
-    ) as DecodedToken;
-    const user = await User.findOne({
-      _id: decoded._id,
-      'tokens.token': token,
-    });
+    // 2. Ищем сессию через сервис
+    const session = await AuthService.getSession(sessionId);
 
+    if (!session) {
+      // Если кука есть, а сессии нет - чистим куку
+      res.clearCookie('sid');
+      throw new Error('Authentication failed: Invalid session');
+    }
+
+    // 3. Загружаем пользователя
+    const user = await User.findById(session.userId);
     if (!user) {
-      throw new Error('Authentication failed. User not found.');
+      throw new Error('User not found');
+    }
+
+    // 4. Логика продления сессии (Sliding Expiration)
+    const newExpiresAt = await AuthService.refreshSession(sessionId, session);
+    if (newExpiresAt) {
+      // Обновляем куку, чтобы продлить её жизнь в браузере
+      res.cookie('sid', sessionId, {
+        httpOnly: true,
+        signed: true,
+        expires: newExpiresAt,
+      });
     }
 
     req.user = user;
-    req.token = token;
+    req.sessionId = sessionId;
     next();
   } catch (error) {
-    res.status(401).send({ error: 'Authentication failed.' });
+    next(error);
   }
 };
 

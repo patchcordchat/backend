@@ -38,6 +38,23 @@ services:
       retries: 10
       start_period: 30s
 
+  # Redis
+  redis:
+    container_name: redis
+    image: redis:latest
+    ports:
+      - ${REDIS_PORT}:6379
+    volumes:
+      - ./.data/cache:/data
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
 networks:
     backend:
         driver: bridge

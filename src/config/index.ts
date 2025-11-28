@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
-import {type ConnectOptions} from 'mongoose'
+import { type ConnectOptions } from 'mongoose'
+import { type RedisOptions } from 'ioredis';
 
 dotenv.config();
 
@@ -20,6 +21,10 @@ interface Config {
       database: string,
       options?: ConnectOptions | undefined
     }
+    redis: {
+      host: string,
+      port: number,
+    }
   }
 }
 
@@ -37,7 +42,11 @@ const config: Config = {
       port: process.env.MONGO_PORT || '27017',
       username: process.env.MONGO_USERNAME || 'patchcord',
       password: process.env.MONGO_PASSWORD || 'patchcord',
-      database: process.env.MONGO_DATABASE || 'change-me',
+      database: process.env.MONGO_DATABASE || 'patchcord',
+    },
+    redis: {
+      host: process.env.REDIS_HOST || 'localhost',
+      port: parseInt(process.env.REDIS_PORT || '6379'),
     }
   }
 };
