@@ -5,6 +5,7 @@ import meRoutes from './me.routes';
 
 const route = express.Router();
 
+route.use('/@me', meRoutes);
 route.get('/:id', usersController.getUser); // Get User
 route.get('/:id/profile', usersController.getUserProfile); // Get User Profile
 route.use('/:id/messages', (req, res, next) => {
@@ -12,6 +13,5 @@ route.use('/:id/messages', (req, res, next) => {
   messagesRouter(req, res, next);
 });
 
-route.use('/@me', meRoutes);
 
 export default route;

@@ -83,8 +83,6 @@ export class AuthService {
     // Продлеваем, только если прошёл 1 час с последнего обновления
     const ONE_HOUR = 60 * 60 * 1000;
 
-    console.log(session);
-
     if (session.expiresAt.getTime() - now < SESSION_TTL - ONE_HOUR) {
       const newExpiresAt = new Date(now + SESSION_TTL);
 
