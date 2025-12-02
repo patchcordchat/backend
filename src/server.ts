@@ -12,7 +12,7 @@ import config from '@/config';
 
     // Socket
     require('@/socket').initialize(server);
-    
+
     server.listen(config.server.port, () => {
       console.log(`Server running on port ${config.server.port}`);
     });

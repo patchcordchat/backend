@@ -1,31 +1,30 @@
 import dotenv from 'dotenv';
-import { type ConnectOptions } from 'mongoose'
-import { type RedisOptions } from 'ioredis';
+import { type ConnectOptions } from 'mongoose';
 
 dotenv.config();
 
 interface Config {
-  nodeEnv: string,
+  nodeEnv: string;
   app: {
-    key: string,
-  }
+    key: string;
+  };
   server: {
-    port: number,
-  }
+    port: number;
+  };
   database: {
     mongodb: {
-      host: string,
-      port: string,
-      username: string,
-      password: string,
-      database: string,
-      options?: ConnectOptions | undefined
-    }
+      host: string;
+      port: string;
+      username: string;
+      password: string;
+      database: string;
+      options?: ConnectOptions | undefined;
+    };
     redis: {
-      host: string,
-      port: number,
-    }
-  }
+      host: string;
+      port: number;
+    };
+  };
 }
 
 const config: Config = {
@@ -47,8 +46,8 @@ const config: Config = {
     redis: {
       host: process.env.REDIS_HOST || 'localhost',
       port: parseInt(process.env.REDIS_PORT || '6379'),
-    }
-  }
+    },
+  },
 };
 
 export default config;

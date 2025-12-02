@@ -29,21 +29,17 @@ export const modifyChannel = async (
     const { id } = req.params;
     const updates = req.body;
 
-    const channel = await Channel.findByIdAndUpdate(
-      id,
-      updates,
-      { 
-        new: true, 
-        runValidators: true 
-      }
-    );
-    
+    const channel = await Channel.findByIdAndUpdate(id, updates, {
+      new: true,
+      runValidators: true,
+    });
+
     if (!channel) {
       return res.status(404).json({
-        error: 'Channel not found'
+        error: 'Channel not found',
       });
     }
-    
+
     res.json(channel);
   } catch (error) {
     next(error);
@@ -63,6 +59,30 @@ export const deleteChannel = async (
       return res.status(404).json({ error: 'Channel not found' });
     }
     res.json(channel);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getMyPrivateChannels = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    res.json({ message: 'Success' });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const createMyPrivateChannel = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    res.json({ message: 'Success' });
   } catch (error) {
     next(error);
   }

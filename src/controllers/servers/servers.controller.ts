@@ -104,8 +104,8 @@ export const deleteServer = async (
   }
 
   try {
-    await Server.deleteOne({_id: id});
-    
+    await Server.deleteOne({ _id: id });
+
     res.json({ message: 'Success' });
   } catch (error) {
     next(error);
@@ -169,6 +169,30 @@ export const addServerMember = (
 };
 
 export const getServerRoles = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    res.json({ message: 'Success' });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getMyServers = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    res.json({ message: 'Success' });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const leaveFromServer = (
   req: Request,
   res: Response,
   next: NextFunction,
