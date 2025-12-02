@@ -15,7 +15,7 @@ route.post('/delete', meController.deleteMyAccount); // Delete Current User Acco
 route.get('/servers', serversController.getMyServers); // Get Current User Servers
 route.delete('/servers/:server_id', serversController.leaveFromServer); // Leave Server
 
-route.get('/channels', channelsController.getMyPrivateChannels); // Get Private Channels
-route.post('/channels', channelsController.createMyPrivateChannel); // Create Private Channel
+route.get('/channels', channelsController.getPrivateChannels); // Get Private Channels
+route.post('/channels', channelsController.createPrivateChannel); // Create Private Channel
 
 export default route;

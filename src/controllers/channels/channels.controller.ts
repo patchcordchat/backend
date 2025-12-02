@@ -64,7 +64,7 @@ export const deleteChannel = async (
   }
 };
 
-export const getMyPrivateChannels = (
+export const getPrivateChannels = (
   req: Request,
   res: Response,
   next: NextFunction,
@@ -76,7 +76,7 @@ export const getMyPrivateChannels = (
   }
 };
 
-export const createMyPrivateChannel = (
+export const createPrivateChannel = (
   req: Request,
   res: Response,
   next: NextFunction,
