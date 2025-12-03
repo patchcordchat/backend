@@ -1,11 +1,12 @@
 import express from 'express';
-import { authMiddleware } from '@/middlewares';
+import { authMiddleware, validateRequest } from '@/middlewares';
+import { loginSchema, registerSchema } from '@/schemas/auth.schema';
 import authController from '@/controllers/auth';
 
 const route = express.Router();
 
-route.post('/login', authController.login); // Login Account
-route.post('/register', authController.register); // Register Account
+route.post('/login', validateRequest(loginSchema),  authController.login); // Login Account
+route.post('/register', validateRequest(registerSchema), authController.register); // Register Account
 
 route.post('/register/phone', authController.registerByPhone); // Register Account with Phone Number
 route.post('/password/validate', authController.validatePasswordStrength); // Get Password Strength

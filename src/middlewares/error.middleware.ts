@@ -1,15 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-
-export class ApiError extends Error {
-  constructor(
-    message?: string,
-    public status?: number,
-  ) {
-    super(message);
-    this.status = status;
-    Error.captureStackTrace(this, this.constructor);
-  }
-}
+import { ApiError } from '@/errors';
 
 const errorMiddleware = (
   err: ApiError,
@@ -17,12 +7,23 @@ const errorMiddleware = (
   res: Response,
   next: NextFunction,
 ) => {
-  console.error(err);
-  res.status(err.status || 500).json({
-    error: {
-      message: err.message || 'Internal Server Error',
-    },
-  });
+  console.error('Error:', err);
+
+  const status = err.status ?? 500;
+  const message =
+    status >= 500 ? 'Internal Server Error' : (err.message ?? 'Error');
+
+  const response: any = { error: { message } };
+
+  if (err instanceof ApiError && status < 500 && err.details !== undefined) {
+    response.error.details = err.details;
+  }
+
+  if (err instanceof ApiError && err.code) {
+    response.error.code = err.code;
+  }
+
+  res.status(status).json(response);
 };
 
 export default errorMiddleware;
