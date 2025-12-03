@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import { CustomRequest } from '@/middlewares/auth.middleware';
 
-export const getMe = (req: CustomRequest, res: Response, next: NextFunction) => {
+export const getMe = (req: Request, res: Response, next: NextFunction) => {
   try {
     res.json(req.user);
   } catch (error) {

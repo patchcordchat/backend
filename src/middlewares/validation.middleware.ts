@@ -1,6 +1,22 @@
 import { Request, Response, NextFunction } from 'express';
 import { BadRequestError } from '@/errors';
+import express from 'express';
 import { z } from 'zod';
+
+const descriptor = Object.getOwnPropertyDescriptor(express.request, 'query');
+if (descriptor) {
+	Object.defineProperty(express.request, 'query', {
+		get(this: Request) {
+			if (this.hasOwnProperty('_query')) return this._query;
+			return descriptor?.get?.call(this);
+		},
+		set(this: Request, query: unknown) {
+			this._query = query;
+		},
+		configurable: true,
+		enumerable: true
+	});
+}
 
 type RequestPart = 'body' | 'query' | 'params';
 
@@ -20,9 +36,9 @@ const validateRequest =
         typeof req.params
       ];
 
-      res.locals.body = validatedBody;
-      res.locals.query = validatedQuery;
-      res.locals.params = validatedParams;
+      req.body = validatedBody;
+      req.query = validatedQuery;
+      req.params = validatedParams;
 
       next();
     } catch (error) {

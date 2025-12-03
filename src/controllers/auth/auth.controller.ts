@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from 'express';
-import { CustomRequest } from '@/middlewares/auth.middleware';
 import { AuthService } from '@/services/auth.service';
 import { UnauthorizedError, ApiError } from '@/errors';
 import User from '@/models/user';
@@ -23,7 +22,7 @@ export const login = async (
   next: NextFunction,
 ) => {
   try {
-    const { email, password } = res.locals.body;
+    const { email, password } = req.body;
 
     const user = await User.findByCredentials(email, password);
     if (!user) throw new UnauthorizedError('Invalid login or password');
@@ -54,10 +53,10 @@ export const register = async (
   next: NextFunction,
 ) => {
   try {
-    const existingUser = await User.findOne({ email: res.locals.body.email });
+    const existingUser = await User.findOne({ email: req.body.email });
     if (existingUser) throw new ApiError('Email already exists', 409);
 
-    const newUser = new User(res.locals.body);
+    const newUser = new User(req.body);
     await newUser.save();
 
     // Сразу логиним после регистрации
@@ -78,7 +77,7 @@ export const register = async (
 };
 
 export const logout = async (
-  req: CustomRequest,
+  req: Request,
   res: Response,
   next: NextFunction,
 ) => {
