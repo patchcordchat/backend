@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import { CustomRequest } from '@/middlewares/auth.middleware';
 import { AuthService } from '@/services/auth.service';
-import { ApiError } from '@/middlewares/error.middleware';
+import { UnauthorizedError, ApiError } from '@/errors';
 import User from '@/models/user';
 
 const setSessionCookie = (
@@ -24,10 +23,9 @@ export const login = async (
 ) => {
   try {
     const { email, password } = req.body;
-    if (!email || !password) throw new ApiError('Missing fields', 400);
 
     const user = await User.findByCredentials(email, password);
-    if (!user) throw new ApiError('Invalid credentials', 401);
+    if (!user) throw new UnauthorizedError('Invalid login or password');
 
     // Создаем сессию
     const ip = req.ip || req.socket.remoteAddress || '';
@@ -56,7 +54,7 @@ export const register = async (
 ) => {
   try {
     const existingUser = await User.findOne({ email: req.body.email });
-    if (existingUser) throw new ApiError('Email exists', 409);
+    if (existingUser) throw new ApiError('Email already exists', 409);
 
     const newUser = new User(req.body);
     await newUser.save();
@@ -79,7 +77,7 @@ export const register = async (
 };
 
 export const logout = async (
-  req: CustomRequest,
+  req: Request,
   res: Response,
   next: NextFunction,
 ) => {
@@ -102,8 +100,8 @@ export const registerByPhone = async (
 ) => {
   try {
     res.json({ message: 'Success' });
-  } catch (error) {
-    next(error);
+  } catch (e) {
+    next(e);
   }
 };
 
@@ -114,8 +112,8 @@ export const validatePasswordStrength = async (
 ) => {
   try {
     res.json({ message: 'Success' });
-  } catch (error) {
-    next(error);
+  } catch (e) {
+    next(e);
   }
 };
 
@@ -126,8 +124,8 @@ export const forgotPassword = async (
 ) => {
   try {
     res.json({ message: 'Success' });
-  } catch (error) {
-    next(error);
+  } catch (e) {
+    next(e);
   }
 };
 
@@ -138,8 +136,8 @@ export const resetPassword = async (
 ) => {
   try {
     res.json({ message: 'Success' });
-  } catch (error) {
-    next(error);
+  } catch (e) {
+    next(e);
   }
 };
 
@@ -150,7 +148,7 @@ export const revertAccount = async (
 ) => {
   try {
     res.json({ message: 'Success' });
-  } catch (error) {
-    next(error);
+  } catch (e) {
+    next(e);
   }
 };

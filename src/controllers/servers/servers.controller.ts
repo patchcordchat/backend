@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { CustomRequest } from '@/middlewares/auth.middleware';
-import { ApiError } from '@/middlewares/error.middleware';
+import { BadRequestError, NotFoundError, UnauthorizedError } from '@/errors';
 import Server, { IServer } from '@/models/server';
 
 export const getServer = async (
@@ -11,11 +10,11 @@ export const getServer = async (
   try {
     const id = req.params?.id;
     if (!id) {
-      throw new ApiError('Invalid request.', 400);
+      throw new BadRequestError('Invalid request.');
     }
     const existingServer = await Server.find({ _id: id });
     if (!existingServer) {
-      throw new ApiError('Server not found', 404);
+      throw new NotFoundError('Server not found');
     }
     res.json(existingServer);
   } catch (error) {
@@ -24,29 +23,17 @@ export const getServer = async (
 };
 
 export const createServer = async (
-  req: CustomRequest,
+  req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   if (!req.user) {
-    throw new ApiError('Authentication failed. User not found.', 403);
-  }
-
-  const serverData: Partial<IServer> = {
-    name: req.body.name,
-    description: req.body.description,
-    afk_timeout: req.body.afk_timeout,
-  };
-
-  if (!serverData.name) {
-    throw new ApiError('Please provide all the required fields.', 400);
+    throw new UnauthorizedError('Authentication failed. User not found.');
   }
 
   try {
     const newServer = new Server({
-      name: serverData.name,
-      description: serverData.description,
-      afk_timeout: serverData.afk_timeout,
+      ...req.body,
       owner_id: req.user.id,
     });
 
@@ -64,26 +51,18 @@ export const modifyServer = async (
   next: NextFunction,
 ) => {
   const id = req.params?.id;
-  if (!id) {
-    throw new ApiError('Invalid request.', 400);
-  }
+
   const existingServer = await Server.findById(id);
   if (!existingServer) {
-    throw new ApiError('Server not found', 404);
+    throw new NotFoundError('Server not found');
   }
 
-  const serverData: Partial<IServer> = {
-    name: req.body.name,
-    description: req.body.description,
-    afk_timeout: req.body.afk_timeout,
-  };
-
   try {
-    existingServer.name = serverData.name ?? existingServer.name;
+    existingServer.name = req.body.name ?? existingServer.name;
     existingServer.description =
-      serverData.description ?? existingServer.description;
+      req.body.description ?? existingServer.description;
     existingServer.afk_timeout =
-      serverData.afk_timeout ?? existingServer.afk_timeout;
+      req.body.afk_timeout ?? existingServer.afk_timeout;
 
     await existingServer.save();
 
@@ -99,9 +78,6 @@ export const deleteServer = async (
   next: NextFunction,
 ) => {
   const id = req.params?.id;
-  if (!id) {
-    throw new ApiError('Invalid request.', 400);
-  }
 
   try {
     await Server.deleteOne({ _id: id });

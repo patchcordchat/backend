@@ -2,13 +2,8 @@ import { Request, Response, NextFunction } from 'express';
 import { AuthService } from '@/services/auth.service';
 import User, { IUser } from '@/models/user';
 
-export interface CustomRequest extends Request {
-  user?: IUser;
-  sessionId?: string;
-}
-
 const authMiddleware = async (
-  req: CustomRequest,
+  req: Request,
   res: Response,
   next: NextFunction,
 ) => {
