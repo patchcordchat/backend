@@ -2,6 +2,7 @@ import express from 'express';
 import { authMiddleware, validateRequest } from '@/middlewares';
 import { loginSchema, registerSchema } from '@/schemas/auth.schema';
 import authController from '@/controllers/auth';
+import sessionsRouter from './sessions.routes';
 
 const route = express.Router();
 
@@ -16,5 +17,10 @@ route.post('/forgot', authMiddleware, authController.forgotPassword); // Forgot 
 route.post('/reset', authMiddleware, authController.resetPassword); // Reset Password
 
 route.post('/revert', authController.revertAccount); // Revert Account
+
+route.use('/sessions', (req, res, next) => {
+  sessionsRouter(req, res, next);
+});
+
 
 export default route;
