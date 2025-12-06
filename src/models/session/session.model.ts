@@ -13,11 +13,10 @@ const sessionSchema = new Schema<ISession>(
       ref: 'User',
       required: true,
     },
-    ip: {
-      type: String,
-    },
-    user_agent: {
-      type: String,
+    client_info: {
+      os: { type: String, default: 'Unknown' },
+      platform: { type: String, default: 'Unknown' },
+      ip: { type: String, select: false },
     },
     expires_at: {
       type: Number,

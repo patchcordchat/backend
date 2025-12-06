@@ -1,6 +1,7 @@
 import crypto from 'crypto';
 import Session, { type ISession } from '@/models/session';
 import redis from '@/lib/ioredis';
+import { UAParser } from 'ua-parser-js';
 
 const SESSION_TTL = 24 * 60 * 60 * 1000; // 24 часа в миллисекундах
 const REDIS_TTL_SECONDS = 24 * 60 * 60; // То же самое в секундах для Redis
@@ -10,13 +11,22 @@ export class AuthService {
    * Создать новую сессию
    */
   static async createSession(userId: string, ip: string, userAgent: string) {
+    const parser = new UAParser(userAgent);
+
+    const os = `${parser.getOS().name || 'Unknown'} ${parser.getOS().version || ''}`.trim();
+    const platform = `${parser.getBrowser().name || 'Unknown'} ${parser.getBrowser().version || ''}`.trim();
+
     const sessionId = crypto.randomBytes(32).toString('hex');
     const expiresAt = Date.now() + SESSION_TTL;
 
     const sessionData = {
       id: sessionId,
       user_id: userId,
-      ip,
+      client_info: {
+        os,
+        platform,
+        ip,
+      },
       user_agent: userAgent,
       expires_at: expiresAt,
       last_active: Date.now(),
