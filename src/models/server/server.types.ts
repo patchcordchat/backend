@@ -1,7 +1,7 @@
 import { Schema, type Document } from 'mongoose';
 
 export interface IServer extends Document {
-  _id: Schema.Types.UUID,
+  _id: Schema.Types.UUID;
   id: Schema.Types.UUID;
   name: string;
   icon?: string;
@@ -10,6 +10,6 @@ export interface IServer extends Document {
   afk_channel_id?: Schema.Types.UUID;
   afk_timeout: number;
   max_members: number;
-  createdAt: Date;
-  updatedAt: Date;
+  created_at: number;
+  updated_at: number;
 }

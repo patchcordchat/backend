@@ -27,14 +27,14 @@ export const createServer = async (
   res: Response,
   next: NextFunction,
 ) => {
-  if (!req.user) {
-    throw new UnauthorizedError('Authentication failed. User not found.');
-  }
-
   try {
+    if (!req.session) {
+      throw new UnauthorizedError('Unauthorized');
+    }
+    
     const newServer = new Server({
       ...req.body,
-      owner_id: req.user.id,
+      owner_id: req.session.user_id,
     });
 
     await newServer.save();

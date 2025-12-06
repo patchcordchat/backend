@@ -6,12 +6,12 @@ import User from '@/models/user';
 const setSessionCookie = (
   res: Response,
   sessionId: string,
-  expiresAt: Date,
+  expiresAt: number,
 ) => {
   res.cookie('sid', sessionId, {
     httpOnly: true,
     signed: true,
-    expires: expiresAt,
+    expires: new Date(expiresAt),
     sameSite: 'lax',
   });
 };
@@ -82,8 +82,8 @@ export const logout = async (
   next: NextFunction,
 ) => {
   try {
-    if (req.sessionId) {
-      await AuthService.deleteSession(req.sessionId);
+    if (req.session?.id) {
+      await AuthService.deleteSession(req.session.id);
     }
 
     res.clearCookie('sid');

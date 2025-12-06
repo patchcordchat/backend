@@ -27,11 +27,29 @@ const inviteSchema = new Schema<IInvite>(
       required: true,
     },
     expires_at: {
-      type: Date,
+      type: Number,
       required: true,
-    }
+    },
+    created_at: {
+      type: Number,
+      required: true,
+      default: Date.now,
+    },
+    updated_at: {
+      type: Number,
+      required: true,
+      default: Date.now,
+    },
   },
-  { timestamps: true, collection: 'invites' },
+  {
+    timestamps: {
+      currentTime: () => Date.now(),
+      createdAt: 'created_at',
+      updatedAt: 'updated_at',
+    },
+    collection: 'invites',
+    versionKey: false,
+  },
 );
 
 inviteSchema.plugin(toJSONPlugin<IInvite>);

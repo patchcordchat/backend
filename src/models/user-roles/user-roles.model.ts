@@ -16,8 +16,25 @@ const userRolesSchema = new Schema<IUserRoles>(
       type: Schema.Types.ObjectId,
       ref: 'Role',
     },
+    created_at: {
+      type: Number,
+      required: true,
+      default: Date.now,
+    },
+    updated_at: {
+      type: Number,
+      required: true,
+      default: Date.now,
+    },
   },
-  { timestamps: true, collection: 'user-roles' },
+  {
+    timestamps: {
+      currentTime: () => Date.now(),
+      createdAt: 'created_at',
+      updatedAt: 'updated_at',
+    },
+    collection: 'user-roles',
+  },
 );
 
 userRolesSchema.plugin(toJSONPlugin<IUserRoles>);

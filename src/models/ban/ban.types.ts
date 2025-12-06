@@ -6,5 +6,5 @@ export interface IBan {
     server_id: Schema.Types.ObjectId
     user_id: Schema.Types.ObjectId
     reason: string
-    banned_at: Date
+    banned_at: number
 }

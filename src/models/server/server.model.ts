@@ -37,10 +37,25 @@ const serverSchema = new Schema<IServer>(
     max_members: {
       type: Number,
     },
+    created_at: {
+      type: Number,
+      required: true,
+      default: Date.now,
+    },
+    updated_at: {
+      type: Number,
+      required: true,
+      default: Date.now,
+    },
   },
   {
-    timestamps: true,
+    timestamps: {
+      currentTime: () => Date.now(),
+      createdAt: 'created_at',
+      updatedAt: 'updated_at',
+    },
     collection: 'servers',
+    versionKey: false,
   },
 );
 

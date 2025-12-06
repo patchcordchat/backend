@@ -18,11 +18,31 @@ const userRelationshipSchema = new Schema<IUserRelationship>(
     },
     status: {
       type: String,
-    }
+    },
+    created_at: {
+      type: Number,
+      required: true,
+      default: Date.now,
+    },
+    updated_at: {
+      type: Number,
+      required: true,
+      default: Date.now,
+    },
   },
-  { timestamps: true, collection: 'user-relationships' },
+  {
+    timestamps: {
+      currentTime: () => Date.now(),
+      createdAt: 'created_at',
+      updatedAt: 'updated_at',
+    },
+    collection: 'user-relationships',
+  },
 );
 
 userRelationshipSchema.plugin(toJSONPlugin<IUserRelationship>);
 
-export default model<IUserRelationship>('UserRelationship', userRelationshipSchema);
+export default model<IUserRelationship>(
+  'UserRelationship',
+  userRelationshipSchema,
+);

@@ -73,9 +73,23 @@ const userSchema = new Schema<IUser, UserModel, IUserMethods>(
       required: true,
       private: true,
     },
+    created_at: {
+      type: Number,
+      required: true,
+      default: Date.now,
+    },
+    updated_at: {
+      type: Number,
+      required: true,
+      default: Date.now,
+    },
   },
   {
-    timestamps: true,
+    timestamps: {
+      currentTime: () => Date.now(),
+      createdAt: 'created_at',
+      updatedAt: 'updated_at',
+    },
     collection: 'users',
   },
 );

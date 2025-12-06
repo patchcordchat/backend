@@ -11,15 +11,15 @@ export class AuthService {
    */
   static async createSession(userId: string, ip: string, userAgent: string) {
     const sessionId = crypto.randomBytes(32).toString('hex');
-    const expiresAt = new Date(Date.now() + SESSION_TTL);
+    const expiresAt = Date.now() + SESSION_TTL;
 
     const sessionData = {
-      userId,
-      sessionId,
+      id: sessionId,
+      user_id: userId,
       ip,
-      userAgent,
-      expiresAt,
-      lastActive: new Date(),
+      user_agent: userAgent,
+      expires_at: expiresAt,
+      last_active: Date.now(),
     };
 
     // 1. Сохраняем в MongoDB
@@ -46,10 +46,6 @@ export class AuthService {
     const cachedSession = await redis.get(redisKey);
     if (cachedSession) {
       const session = JSON.parse(cachedSession) as ISession;
-
-      session.expiresAt = new Date(session.expiresAt as unknown as string);
-      session.lastActive = new Date(session.lastActive as unknown as string);
-
       return session;
     }
 
@@ -58,14 +54,14 @@ export class AuthService {
 
     if (session) {
       // Проверяем, не истекла ли она
-      if (session.expiresAt.getTime() < Date.now()) {
+      if (session.expires_at < Date.now()) {
         await Session.deleteOne({ sessionId });
         return null;
       }
 
       // 3. Если нашли в базе - кладем в Redis
       // Вычисляем оставшееся время жизни для Redis
-      const ttl = Math.ceil((session.expiresAt.getTime() - Date.now()) / 1000);
+      const ttl = Math.ceil((session.expires_at - Date.now()) / 1000);
       if (ttl > 0) {
         await redis.set(redisKey, JSON.stringify(session), 'EX', ttl);
       }
@@ -78,27 +74,27 @@ export class AuthService {
   /**
    * Продлить сессию
    */
-  static async refreshSession(sessionId: string, session: ISession) {
+  static async refreshSession(session: ISession) {
     const now = Date.now();
     // Продлеваем, только если прошёл 1 час с последнего обновления
     const ONE_HOUR = 60 * 60 * 1000;
 
-    if (session.expiresAt.getTime() - now < SESSION_TTL - ONE_HOUR) {
-      const newExpiresAt = new Date(now + SESSION_TTL);
+    if (session.expires_at - now < SESSION_TTL - ONE_HOUR) {
+      const newExpiresAt = now + SESSION_TTL;
 
       // Обновляем в Mongo
       await Session.updateOne(
-        { sessionId },
-        { expiresAt: newExpiresAt, lastActive: new Date() },
+        { id: session.id },
+        { expires_at: newExpiresAt, last_active: new Date() },
       );
 
       // Обновляем объект в памяти для Redis
-      session.expiresAt = newExpiresAt;
-      session.lastActive = new Date();
+      session.expires_at = newExpiresAt;
+      session.last_active = Date.now();
 
       // Обновляем в Redis
       await redis.set(
-        `session:${sessionId}`,
+        `session:${session.id}`,
         JSON.stringify(session),
         'EX',
         REDIS_TTL_SECONDS,
