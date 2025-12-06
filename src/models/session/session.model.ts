@@ -3,35 +3,63 @@ import { ISession } from './session.types';
 
 const sessionSchema = new Schema<ISession>(
   {
-    userId: {
-      type: Schema.Types.ObjectId,
-      ref: 'User',
-      required: true,
-    },
-    sessionId: {
+    id: {
       type: String,
       required: true,
       unique: true,
     },
-    ip: {
-      type: String,
-    },
-    userAgent: {
-      type: String,
-    },
-    expiresAt: {
-      type: Schema.Types.Date,
+    user_id: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
       required: true,
     },
-    lastActive: {
-      type: Schema.Types.Date,
+    client_info: {
+      os: { type: String, default: 'Unknown' },
+      platform: { type: String, default: 'Unknown' },
+      ip: { type: String, select: false },
+    },
+    expires_at: {
+      type: Number,
+      required: true,
+    },
+    last_active: {
+      type: Number,
+      default: Date.now,
+    },
+    _ttl: {
+      type: Date,
+      select: false,
+    },
+    created_at: {
+      type: Number,
+      required: true,
+      default: Date.now,
+    },
+    updated_at: {
+      type: Number,
+      required: true,
       default: Date.now,
     },
   },
-  { timestamps: true, collection: 'sessions' },
+  {
+    timestamps: {
+      currentTime: () => Date.now(),
+      createdAt: 'created_at',
+      updatedAt: 'updated_at',
+    },
+    collection: 'sessions',
+    versionKey: false,
+  },
 );
 
-sessionSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+sessionSchema.index({ _ttl: 1 }, { expireAfterSeconds: 0 });
+
+sessionSchema.pre('save', function (next) {
+  if (this.isModified('expires_at')) {
+    this._ttl = new Date(this.expires_at);
+  }
+  next();
+});
 
 const Session = model<ISession>('Session', sessionSchema);
 

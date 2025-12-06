@@ -25,6 +25,6 @@ export interface IChannel extends Document {
   owner_id: Schema.Types.ObjectId;
   member_count: number;
   flags: ChannelFlags;
-  createdAt: Date;
-  updatedAt: Date;
+  created_at: number;
+  updated_at: number;
 }

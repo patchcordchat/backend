@@ -47,8 +47,26 @@ const channelSchema = new Schema<IChannel>(
       required: true,
       default: ChannelFlags.NONE,
     },
+    created_at: {
+      type: Number,
+      required: true,
+      default: Date.now,
+    },
+    updated_at: {
+      type: Number,
+      required: true,
+      default: Date.now,
+    },
   },
-  { timestamps: true, collection: 'channels' },
+  {
+    timestamps: {
+      currentTime: () => Date.now(),
+      createdAt: 'created_at',
+      updatedAt: 'updated_at',
+    },
+    collection: 'channels',
+    versionKey: false,
+  },
 );
 
 channelSchema.plugin(toJSONPlugin<IChannel>);

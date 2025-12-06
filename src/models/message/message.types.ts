@@ -40,6 +40,6 @@ export interface IMessage extends Document {
   pinned: boolean;
   type: MessageTypes;
   flags: number;
-  createdAt: Date;
-  updatedAt: Date;
+  created_at: number;
+  updated_at: number;
 }

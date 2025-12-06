@@ -45,10 +45,12 @@ const messageSchema = new Schema<IMessage>(
       type: Boolean,
       default: false,
     },
-    attachments: [{
-      type: Schema.Types.ObjectId,
-      ref: 'File',
-    }],
+    attachments: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'File',
+      },
+    ],
     reactions: [reactionSchema],
     pinned: {
       type: Boolean,
@@ -64,7 +66,7 @@ const messageSchema = new Schema<IMessage>(
       default: 0,
     },
   },
-  { timestamps: false, collection: 'messages' },
+  { timestamps: false, collection: 'messages', versionKey: false },
 );
 
 messageSchema.plugin(toJSONPlugin<IMessage>);

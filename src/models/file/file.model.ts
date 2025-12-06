@@ -40,10 +40,25 @@ const fileSchema = new Schema<IFile>(
       type: Schema.Types.ObjectId,
       required: true,
     },
+    created_at: {
+      type: Number,
+      required: true,
+      default: Date.now,
+    },
+    updated_at: {
+      type: Number,
+      required: true,
+      default: Date.now,
+    },
   },
   {
-    timestamps: true,
-    collection: 'users',
+    timestamps: {
+      currentTime: () => Date.now(),
+      createdAt: 'created_at',
+      updatedAt: 'updated_at',
+    },
+    collection: 'files',
+    versionKey: false,
   },
 );
 

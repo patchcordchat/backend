@@ -13,5 +13,7 @@ export interface IInvite {
   inviter_id: Schema.Types.ObjectId;
   code: string;
   type: InviteTypes;
-  expires_at: Date;
+  expires_at: number;
+  created_at: number;
+  updated_at: number;
 }

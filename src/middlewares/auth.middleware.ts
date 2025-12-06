@@ -23,26 +23,19 @@ const authMiddleware = async (
       res.clearCookie('sid');
       throw new Error('Authentication failed: Invalid session');
     }
-
-    // 3. Загружаем пользователя
-    const user = await User.findById(session.userId);
-    if (!user) {
-      throw new Error('User not found');
-    }
-
+    
     // 4. Логика продления сессии (Sliding Expiration)
-    const newExpiresAt = await AuthService.refreshSession(sessionId, session);
+    const newExpiresAt = await AuthService.refreshSession(session);
     if (newExpiresAt) {
       // Обновляем куку, чтобы продлить её жизнь в браузере
-      res.cookie('sid', sessionId, {
+      res.cookie('sid', session.id, {
         httpOnly: true,
         signed: true,
-        expires: newExpiresAt,
+        expires: new Date(newExpiresAt),
       });
     }
 
-    req.user = user;
-    req.sessionId = sessionId;
+    req.session = session;
     next();
   } catch (error) {
     next(error);

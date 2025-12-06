@@ -16,8 +16,8 @@ export interface IUser extends Document {
   public_flags: number;
   password: string;
   tokens: { token: string }[];
-  createdAt: Date;
-  updatedAt: Date;
+  created_at: number;
+  updated_at: number;
 }
 
 export enum UserFlags {

@@ -23,8 +23,26 @@ const roleSchema = new Schema<IRole>(
       required: true,
       default: RolePermissions.ADMINISTRATOR,
     },
+    created_at: {
+      type: Number,
+      required: true,
+      default: Date.now,
+    },
+    updated_at: {
+      type: Number,
+      required: true,
+      default: Date.now,
+    },
   },
-  { timestamps: true, collection: 'roles' },
+  {
+    timestamps: {
+      currentTime: () => Date.now(),
+      createdAt: 'created_at',
+      updatedAt: 'updated_at',
+    },
+    collection: 'roles',
+    versionKey: false,
+  },
 );
 
 roleSchema.plugin(toJSONPlugin<IRole>);

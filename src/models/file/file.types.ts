@@ -11,4 +11,6 @@ export interface IFile {
   message_id: Schema.Types.ObjectId;
   user_id: Schema.Types.ObjectId;
   server_id: Schema.Types.ObjectId;
+  created_at: number;
+  updated_at: number;
 }
