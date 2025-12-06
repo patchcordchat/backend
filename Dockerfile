@@ -1,9 +1,15 @@
-FROM node:25-alpine
-
-RUN npm install -g nodemon
+FROM node:25-alpine AS builder
 WORKDIR /app
-COPY package.json .
-RUN npm install
+COPY package*.json ./
+RUN npm ci
 COPY . .
+RUN npm run build
+
+FROM node:25-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --only=production
+COPY --from=builder /app/dist ./dist
+USER node
 EXPOSE 3000
-CMD ["npm", "run", "dev"]
+CMD ["node", "dist/server.js"]

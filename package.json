@@ -4,7 +4,7 @@
   "scripts": {
     "build": "tsc && tsc-alias",
     "start": "npm run build && node ./dist/server.js",
-    "dev": "nodemon",
+    "dev": "nodemon -L",
     "lint": "eslint 'src/**/*.ts'",
     "test": "jest",
     "test:watch": "jest --watch"
