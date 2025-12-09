@@ -1,11 +1,16 @@
-FROM node:25-alpine AS builder
+FROM node:25-alpine AS base
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci
+RUN npm install
+
+FROM base AS dev
+CMD ["npm", "run", "dev"]
+
+FROM base AS builder
 COPY . .
 RUN npm run build
 
-FROM node:25-alpine
+FROM node:25-alpine AS prod
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci --only=production
