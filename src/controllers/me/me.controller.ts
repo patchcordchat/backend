@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 
 export const getMe = (req: Request, res: Response, next: NextFunction) => {
   try {
-    res.json(req.user);
+    
   } catch (error) {
     next(error);
   }

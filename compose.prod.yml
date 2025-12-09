@@ -1,9 +1,9 @@
 services:
+  # NodeJS Backend
   api:
-    container_name: api
     build: 
       context: .
-      dockerfile: Dockerfile
+      target: prod
     ports:
       - "${SERVER_PORT:-3000}:3000"
     restart: always
@@ -16,7 +16,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-  
+
+  # Nginx
   nginx:
     image: nginx:alpine
     ports:
@@ -27,16 +28,16 @@ services:
     depends_on:
       - api
 
+  # MongoDB
   mongodb:
     image: mongo:4.4
-    container_name: mongodb
     restart: always
     volumes:
       - mongodb_data:/data/db
 
+  # Redis
   redis:
     image: redis:latest
-    container_name: redis
     restart: always
     volumes:
       - redis_data:/data
