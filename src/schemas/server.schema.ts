@@ -43,7 +43,7 @@ export const getServerMembersSchema = {
     server_id: z.string(),
   }),
   query: z.object({
-    limit: z.int().gte(1).lte(1000).default(1).optional(),
+    limit: z.coerce.number().int().gte(1).lte(1000).default(1).optional(),
     after: z.string().optional(),
   }),
 };

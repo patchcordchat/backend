@@ -52,7 +52,7 @@ const inviteSchema = new Schema<IInvite>(
   },
 );
 
-inviteSchema.plugin(toJSONPlugin<IInvite>);
+inviteSchema.plugin(toJSONPlugin<IInvite>());
 
 // Добавление индексов
 inviteSchema.index({ server_id: 1 });

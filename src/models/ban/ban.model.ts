@@ -48,7 +48,7 @@ const banSchema = new Schema<IBan>(
   },
 );
 
-banSchema.plugin(toJSONPlugin<IBan>);
+banSchema.plugin(toJSONPlugin<IBan>());
 
 // Добавление индексов
 banSchema.index({ server_id: 1 });
