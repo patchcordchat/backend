@@ -1,20 +1,49 @@
 import { Request, Response, NextFunction } from 'express';
 import Channel from '@/models/channel';
 
+export const getServerChannels = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    res.json({ message: 'Success' });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const createServerChannel = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    res.json({ message: 'Success' });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const modifyChannelPosition = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    res.json({ message: 'Success' });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getChannel = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   try {
-    const { id } = req.params;
-    const channel = await Channel.findById(id);
-
-    if (!channel) {
-      return res.status(404).json({ error: 'Channel not found' });
-    }
-
-    res.json(channel);
+    res.json({ message: 'Success' });
   } catch (error) {
     next(error);
   }
@@ -26,21 +55,7 @@ export const modifyChannel = async (
   next: NextFunction,
 ) => {
   try {
-    const { id } = req.params;
-    const updates = req.body;
-
-    const channel = await Channel.findByIdAndUpdate(id, updates, {
-      new: true,
-      runValidators: true,
-    });
-
-    if (!channel) {
-      return res.status(404).json({
-        error: 'Channel not found',
-      });
-    }
-
-    res.json(channel);
+    res.json({ message: 'Success' });
   } catch (error) {
     next(error);
   }
@@ -52,13 +67,7 @@ export const deleteChannel = async (
   next: NextFunction,
 ) => {
   try {
-    const { id } = req.params;
-    const channel = await Channel.findByIdAndDelete(id);
-
-    if (!channel) {
-      return res.status(404).json({ error: 'Channel not found' });
-    }
-    res.json(channel);
+    res.json({ message: 'Success' });
   } catch (error) {
     next(error);
   }
@@ -77,6 +86,42 @@ export const getPrivateChannels = (
 };
 
 export const createPrivateChannel = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    res.json({ message: 'Success' });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getDMChannel = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    res.json({ message: 'Success' });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const triggerTyping = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    res.json({ message: 'Success' });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getCallEligibility = async (
   req: Request,
   res: Response,
   next: NextFunction,

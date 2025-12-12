@@ -13,6 +13,7 @@ import {
   addServerMemberSchema,
   getServerRolesSchema
 } from '@/schemas/server.schema';
+import channelsController from '@/controllers/channels';
 
 const route = express.Router();
 
@@ -75,5 +76,10 @@ route.get(
   validateRequest(getServerRolesSchema),
   serversController.getServerRoles,
 ); // Get Server Roles
+
+route.get('/:server_id/channels',  channelsController.getServerChannels);
+route.post('/:server_id/channels',  channelsController.createServerChannel);
+route.patch('/:server_id/channels',  channelsController.modifyChannelPosition);
+
 
 export default route;

@@ -17,5 +17,6 @@ route.delete('/servers/:server_id', serversController.leaveFromServer); // Leave
 
 route.get('/channels', channelsController.getPrivateChannels); // Get Private Channels
 route.post('/channels', channelsController.createPrivateChannel); // Create Private Channel
+route.get('/dms/:user_id', channelsController.getDMChannel); // Get DM Channel
 
 export default route;

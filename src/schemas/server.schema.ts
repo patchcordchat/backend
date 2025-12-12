@@ -10,7 +10,7 @@ export const createServerSchema = {
   body: z.object({
     name: z.string().min(2).max(100),
     description: z.string().max(300).optional(),
-    afk_timeout: z.number().gte(60).lte(3600).optional(),
+    afk_timeout: z.int().gte(60).lte(3600).optional(),
   })
 };
 
@@ -73,7 +73,7 @@ export const addServerMemberSchema = {
   body: z.object({
     nick: z.string().optional(),
     roles: z.array(z.string()).optional(),
-    flags: z.number().gte(0).optional(),
+    flags: z.int().gte(0).optional(),
   }),
 };
 

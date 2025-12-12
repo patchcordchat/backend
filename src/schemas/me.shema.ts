@@ -7,7 +7,7 @@ export const updateMeSchema = {
     email: z.email().optional(),
     pronouns: z.string().max(40).optional(),
     bio: z.string().max(190).optional(),
-    flags: z.number().gte(0).optional(),
+    flags: z.int().gte(0).optional(),
     date_of_birth: z.date().optional(),
     password: z.string().min(8).max(72).optional(),
     new_password: z.string().min(8).max(72).optional(),
