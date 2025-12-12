@@ -35,7 +35,7 @@ const messageSchema = new Schema<IMessage>(
     },
     timestamp: {
       type: Number,
-      default: new Date().getTime(),
+      default: Date.now,
     },
     edited_timestamp: {
       type: Number,

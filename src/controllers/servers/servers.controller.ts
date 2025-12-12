@@ -3,7 +3,6 @@ import {
   ApiError,
   BadRequestError,
   NotFoundError,
-  UnauthorizedError,
 } from '@/errors';
 import Role from '@/models/role';
 import User from '@/models/user';
@@ -38,20 +37,16 @@ export const createServer = async (
   next: NextFunction,
 ) => {
   try {
-    if (!req.session) {
-      throw new UnauthorizedError('Unauthorized');
-    }
-
     const newServer = new Server({
       ...req.body,
-      owner_id: req.session.user_id,
+      owner_id: req.session?.user_id,
     });
 
     await newServer.save();
 
     const everyoneRole = new Role({
       server_id: newServer._id,
-      name: 'everyone',
+      name: '@everyone',
       permissions: 0,
     });
 
@@ -59,7 +54,8 @@ export const createServer = async (
 
     const ownerMember = new ServerMember({
       server_id: newServer._id,
-      user_id: req.session.user_id,
+      user_id: req.session?.user_id,
+      roles: [everyoneRole._id],
     });
 
     await ownerMember.save();
@@ -138,8 +134,7 @@ export const getServerPreview = async (
       name: server.name,
       icon: server.icon,
       description: server.description,
-      owner_id: server.owner_id,
-      member_count: memberCount,
+      approximate_member_count: memberCount,
     };
 
     res.json(preview);
@@ -210,11 +205,8 @@ export const joinServer = async (
   next: NextFunction,
 ) => {
   try {
-    if (!req.session?.user_id) {
-      throw new UnauthorizedError('Authentication failed. User not found.');
-    }
     const serverId = req.params?.server_id;
-    const userId = req.session.user_id;
+    const userId = req.session?.user_id;
 
     const server = await Server.findById(serverId);
     if (!server) {
@@ -338,7 +330,7 @@ export const leaveFromServer = async (
       throw new NotFoundError('Server not found');
     }
 
-    if (server.owner_id.toString() === userId) {
+    if (userId && server.owner_id.toString() === userId.toString()) {
       throw new BadRequestError('Owner cannot leave a server.');
     }
 
