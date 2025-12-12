@@ -53,6 +53,6 @@ const userRolesSchema = new Schema<IUserSettings>(
   },
 );
 
-userRolesSchema.plugin(toJSONPlugin<IUserSettings>);
+userRolesSchema.plugin(toJSONPlugin<IUserSettings>());
 
 export default model<IUserSettings>('UserSettings', userRolesSchema);

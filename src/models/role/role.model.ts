@@ -45,7 +45,7 @@ const roleSchema = new Schema<IRole>(
   },
 );
 
-roleSchema.plugin(toJSONPlugin<IRole>);
+roleSchema.plugin(toJSONPlugin<IRole>());
 
 // Добавление индексов
 roleSchema.index({ server_id: 1 });

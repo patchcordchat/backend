@@ -69,7 +69,7 @@ const messageSchema = new Schema<IMessage>(
   { timestamps: false, collection: 'messages', versionKey: false },
 );
 
-messageSchema.plugin(toJSONPlugin<IMessage>);
+messageSchema.plugin(toJSONPlugin<IMessage>());
 
 // Добавление индексов
 messageSchema.index({ channel_id: 1, timestamp: -1 });

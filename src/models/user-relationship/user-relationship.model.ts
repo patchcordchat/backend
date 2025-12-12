@@ -40,7 +40,7 @@ const userRelationshipSchema = new Schema<IUserRelationship>(
   },
 );
 
-userRelationshipSchema.plugin(toJSONPlugin<IUserRelationship>);
+userRelationshipSchema.plugin(toJSONPlugin<IUserRelationship>());
 
 export default model<IUserRelationship>(
   'UserRelationship',

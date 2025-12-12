@@ -27,15 +27,15 @@ export interface IReaction {
 }
 
 export interface IMessage extends Document {
-  _id: Schema.Types.UUID;
-  id: Schema.Types.UUID;
-  channel_id: Schema.Types.UUID;
-  author: Schema.Types.UUID;
+  _id: Schema.Types.ObjectId;
+  id: Schema.Types.ObjectId;
+  channel_id: Schema.Types.ObjectId;
+  author: Schema.Types.ObjectId;
   content: string;
   timestamp: number;
   edited_timestamp: number | null;
   tts: boolean;
-  attachments: Schema.Types.UUID[];
+  attachments: Schema.Types.ObjectId[];
   reactions: IReaction[];
   pinned: boolean;
   type: MessageTypes;

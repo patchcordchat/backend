@@ -49,7 +49,7 @@ const serverMemberSchema = new Schema<IServerMember>(
   },
 );
 
-serverMemberSchema.plugin(toJSONPlugin<IServerMember>);
+serverMemberSchema.plugin(toJSONPlugin<IServerMember>());
 
 // Добавление индексов
 serverMemberSchema.index({ server_id: 1 });
