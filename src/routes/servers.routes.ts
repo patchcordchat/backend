@@ -1,19 +1,79 @@
 import express from 'express';
 import serversController from '@/controllers/servers';
+import { validateRequest } from '@/middlewares';
+import {
+  getServerSchema,
+  createServerSchema,
+  modifyServerSchema,
+  deleteServerSchema,
+  getServerPreviewSchema,
+  getServerMembersSchema,
+  searchServerMembersSchema,
+  joinServerSchema,
+  addServerMemberSchema,
+  getServerRolesSchema
+} from '@/schemas/server.schema';
+
 const route = express.Router();
 
-route.get('/:id', serversController.getServer); // Get Server
-route.post('/', serversController.createServer); // Create Server
-route.patch('/:id', serversController.modifyServer); // Modify Server
-route.delete('/:id', serversController.deleteServer); // Delete Server
+route.get(
+  '/:server_id',
+  validateRequest(getServerSchema),
+  serversController.getServer,
+); // Get Server
 
-route.get('/:id/preview', serversController.getServerPreview); // Get Server Preview
-route.get('/:id/members', serversController.getServerMembers); // Get Server Members
-route.get('/:id/members-search', serversController.searchServerMembers); // Search Server Members
+route.post(
+  '/',
+  validateRequest(createServerSchema),
+  serversController.createServer,
+); // Create Server
 
-route.put('/:id/members/@me', serversController.joinServer); // Join Server
-route.post('/:id/members/:user_id', serversController.addServerMember); // Add Server Member
+route.patch(
+  '/:server_id',
+  validateRequest(modifyServerSchema),
+  serversController.modifyServer,
+); // Modify Server
 
-route.get('/:id/roles', serversController.getServerRoles); // Get Server Roles
+route.delete(
+  '/:server_id',
+  validateRequest(deleteServerSchema),
+  serversController.deleteServer,
+); // Delete Server
+
+route.get(
+  '/:server_id/preview',
+  validateRequest(getServerPreviewSchema),
+  serversController.getServerPreview,
+); // Get Server Preview
+
+route.get(
+  '/:server_id/members',
+  validateRequest(getServerMembersSchema),
+  serversController.getServerMembers,
+); // Get Server Members
+
+route.post(
+  '/:server_id/members-search',
+  validateRequest(searchServerMembersSchema),
+  serversController.searchServerMembers,
+); // Search Server Members
+
+route.put(
+  '/:server_id/members/@me',
+  validateRequest(joinServerSchema),
+  serversController.joinServer,
+); // Join Server
+
+route.post(
+  '/:server_id/members/:user_id',
+  validateRequest(addServerMemberSchema),
+  serversController.addServerMember,
+); // Add Server Member
+
+route.get(
+  '/:server_id/roles',
+  validateRequest(getServerRolesSchema),
+  serversController.getServerRoles,
+); // Get Server Roles
 
 export default route;

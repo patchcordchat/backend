@@ -16,6 +16,12 @@ const serverMemberSchema = new Schema<IServerMember>(
       type: Schema.Types.ObjectId,
       ref: 'User',
     },
+    roles: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'Role',
+      },
+    ],
     joined_at: {
       type: Number,
       required: true,

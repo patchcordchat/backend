@@ -1,6 +1,13 @@
 import { Request, Response, NextFunction } from 'express';
-import { BadRequestError, NotFoundError, UnauthorizedError } from '@/errors';
-import Server, { IServer } from '@/models/server';
+import {
+  ApiError,
+  BadRequestError,
+  NotFoundError,
+} from '@/errors';
+import Role from '@/models/role';
+import User from '@/models/user';
+import Server from '@/models/server';
+import ServerMember from '@/models/server-member';
 
 export const getServer = async (
   req: Request,
@@ -8,14 +15,16 @@ export const getServer = async (
   next: NextFunction,
 ) => {
   try {
-    const id = req.params?.id;
-    if (!id) {
+    const serverId = req.params?.server_id;
+    if (!serverId) {
       throw new BadRequestError('Invalid request.');
     }
-    const existingServer = await Server.find({ _id: id });
+
+    const existingServer = await Server.findById(serverId);
     if (!existingServer) {
       throw new NotFoundError('Server not found');
     }
+
     res.json(existingServer);
   } catch (error) {
     next(error);
@@ -28,16 +37,28 @@ export const createServer = async (
   next: NextFunction,
 ) => {
   try {
-    if (!req.session) {
-      throw new UnauthorizedError('Unauthorized');
-    }
-    
     const newServer = new Server({
       ...req.body,
-      owner_id: req.session.user_id,
+      owner_id: req.session?.user_id,
     });
 
     await newServer.save();
+
+    const everyoneRole = new Role({
+      server_id: newServer._id,
+      name: '@everyone',
+      permissions: 0,
+    });
+
+    await everyoneRole.save();
+
+    const ownerMember = new ServerMember({
+      server_id: newServer._id,
+      user_id: req.session?.user_id,
+      roles: [everyoneRole._id],
+    });
+
+    await ownerMember.save();
 
     res.json(newServer);
   } catch (error) {
@@ -50,23 +71,20 @@ export const modifyServer = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const id = req.params?.id;
-
-  const existingServer = await Server.findById(id);
-  if (!existingServer) {
-    throw new NotFoundError('Server not found');
-  }
-
   try {
-    existingServer.name = req.body.name ?? existingServer.name;
-    existingServer.description =
-      req.body.description ?? existingServer.description;
-    existingServer.afk_timeout =
-      req.body.afk_timeout ?? existingServer.afk_timeout;
+    const serverId = req.params?.server_id;
+    if (!serverId) {
+      throw new BadRequestError('Invalid request.');
+    }
 
-    await existingServer.save();
+    const server = await Server.findByIdAndUpdate(serverId, req.body, {
+      new: true,
+    });
+    if (!server) {
+      throw new NotFoundError('Server not found');
+    }
 
-    res.json(existingServer);
+    res.json(server);
   } catch (error) {
     next(error);
   }
@@ -77,10 +95,16 @@ export const deleteServer = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const id = req.params?.id;
+  const serverId = req.params?.server_id;
 
   try {
-    await Server.deleteOne({ _id: id });
+    const result = await Server.findByIdAndDelete(serverId);
+    if (!result) {
+      throw new NotFoundError('Server not found');
+    }
+
+    await ServerMember.deleteMany({ server_id: serverId });
+    await Role.deleteMany({ server_id: serverId });
 
     res.json({ message: 'Success' });
   } catch (error) {
@@ -88,92 +112,233 @@ export const deleteServer = async (
   }
 };
 
-export const getServerPreview = (
+export const getServerPreview = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   try {
-    res.json({ message: 'Success' });
+    const serverId = req.params?.server_id;
+
+    const server = await Server.findById(serverId);
+    if (!server) {
+      throw new NotFoundError('Server not found');
+    }
+
+    const memberCount = await ServerMember.countDocuments({
+      server_id: serverId,
+    });
+
+    const preview = {
+      id: server._id,
+      name: server.name,
+      icon: server.icon,
+      description: server.description,
+      approximate_member_count: memberCount,
+    };
+
+    res.json(preview);
   } catch (error) {
     next(error);
   }
 };
 
-export const getServerMembers = (
+export const getServerMembers = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   try {
-    res.json({ message: 'Success' });
+    const serverId = req.params?.server_id;
+
+    const server = await Server.findById(serverId);
+    if (!server) {
+      throw new NotFoundError('Server not found.');
+    }
+
+    const members = await ServerMember.find({ server_id: serverId }).populate(
+      'user_id',
+      'username global_name avatar bot',
+    );
+
+    res.json(members);
   } catch (error) {
     next(error);
   }
 };
 
-export const searchServerMembers = (
+export const searchServerMembers = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   try {
-    res.json({ message: 'Success' });
+    const serverId = req.params?.server_id;
+    const query = req.query?.query as string;
+
+    if (!query || query.length < 2) {
+      return res.json([]);
+    }
+
+    const serverMembers = await ServerMember.find({
+      server_id: serverId,
+    }).select('user_id');
+    const userIds = serverMembers.map((member) => member.user_id);
+
+    const users = await User.find({
+      _id: { $in: userIds },
+      $or: [
+        { username: { $regex: query, $options: 'i' } },
+        { global_name: { $regex: query, $options: 'i' } },
+      ],
+    }).select('username global_name avatar bot');
+
+    res.json(users);
   } catch (error) {
     next(error);
   }
 };
 
-export const joinServer = (req: Request, res: Response, next: NextFunction) => {
-  try {
-    res.json({ message: 'Success' });
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const addServerMember = (
+export const joinServer = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   try {
-    res.json({ message: 'Success' });
+    const serverId = req.params?.server_id;
+    const userId = req.session?.user_id;
+
+    const server = await Server.findById(serverId);
+    if (!server) {
+      throw new NotFoundError('Server not found');
+    }
+
+    const isMember = await ServerMember.exists({
+      server_id: serverId,
+      user_id: userId,
+    });
+    if (isMember) {
+      throw new ApiError('Already a member', 400);
+    }
+
+    const newMember = new ServerMember({
+      server_id: serverId,
+      user_id: userId,
+    });
+
+    await newMember.save();
+
+    res.json(newMember);
   } catch (error) {
     next(error);
   }
 };
 
-export const getServerRoles = (
+export const addServerMember = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   try {
-    res.json({ message: 'Success' });
+    const serverId = req.params?.server_id;
+    const userIdToAdd = req.params?.user_id;
+
+    const server = await Server.findById(serverId);
+    if (!server) {
+      throw new NotFoundError('Server not found');
+    }
+
+    const userToAdd = await User.findById(userIdToAdd);
+    if (!userToAdd) {
+      throw new NotFoundError('User to add not found');
+    }
+
+    const isMember = await ServerMember.exists({
+      server_id: serverId,
+      user_id: userIdToAdd,
+    });
+    if (isMember) {
+      return res.json({ message: 'User is already a member' });
+    }
+
+    const newMember = new ServerMember({
+      server_id: serverId,
+      user_id: userIdToAdd,
+    });
+
+    await newMember.save();
+
+    res.json(newMember);
   } catch (error) {
     next(error);
   }
 };
 
-export const getMyServers = (
+export const getServerRoles = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   try {
-    res.json({ message: 'Success' });
+    const serverId = req.params?.server_id;
+
+    const serverExists = await Server.exists({ _id: serverId });
+    if (!serverExists) {
+      throw new NotFoundError('Server not found.');
+    }
+
+    const roles = await Role.find({ server_id: serverId });
+
+    res.json(roles);
   } catch (error) {
     next(error);
   }
 };
 
-export const leaveFromServer = (
+export const getMyServers = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   try {
+    const userId = req.session?.user_id;
+
+    const memberEntries = await ServerMember.find({ user_id: userId }).select(
+      'server_id',
+    );
+    const serverIds = memberEntries.map((entry) => entry.server_id);
+
+    const servers = await Server.find({ _id: { $in: serverIds } });
+
+    res.json(servers);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const leaveFromServer = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const serverId = req.params?.server_id;
+    const userId = req.session?.user_id;
+
+    const server = await Server.findById(serverId);
+    if (!server) {
+      throw new NotFoundError('Server not found');
+    }
+
+    if (userId && server.owner_id.toString() === userId.toString()) {
+      throw new BadRequestError('Owner cannot leave a server.');
+    }
+
+    const result = await ServerMember.deleteOne({ server_id: serverId, user_id: userId });
+    if (result.deletedCount === 0) {
+        return res.json({ message: 'You are not a member of this server' });
+    }
+    
     res.json({ message: 'Success' });
   } catch (error) {
     next(error);
