@@ -18,9 +18,7 @@ route.post('/reset', authMiddleware, authController.resetPassword); // Reset Pas
 
 route.post('/revert', authController.revertAccount); // Revert Account
 
-route.use('/sessions', (req, res, next) => {
-  sessionsRouter(req, res, next);
-});
+route.use('/sessions', sessionsRouter);
 
 
 export default route;

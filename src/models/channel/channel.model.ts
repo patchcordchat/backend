@@ -19,7 +19,6 @@ const channelSchema = new Schema<IChannel>(
     },
     position: {
       type: Number,
-      required: true,
     },
     name: {
       type: String,
@@ -69,7 +68,7 @@ const channelSchema = new Schema<IChannel>(
   },
 );
 
-channelSchema.plugin(toJSONPlugin<IChannel>);
+channelSchema.plugin(toJSONPlugin<IChannel>());
 
 // Добавление индексов
 channelSchema.index({ server_id: 1, position: 1 });

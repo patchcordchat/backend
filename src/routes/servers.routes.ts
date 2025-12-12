@@ -11,8 +11,14 @@ import {
   searchServerMembersSchema,
   joinServerSchema,
   addServerMemberSchema,
-  getServerRolesSchema
+  getServerRolesSchema,
 } from '@/schemas/server.schema';
+import {
+  getServerChannelsSchema,
+  createServerChannelSchema,
+  modifyChannelPositionSchema,
+} from '@/schemas/channel.schema';
+import channelsController from '@/controllers/channels';
 
 const route = express.Router();
 
@@ -75,5 +81,23 @@ route.get(
   validateRequest(getServerRolesSchema),
   serversController.getServerRoles,
 ); // Get Server Roles
+
+route.get(
+  '/:server_id/channels',
+  validateRequest(getServerChannelsSchema),
+  channelsController.getServerChannels,
+);
+
+route.post(
+  '/:server_id/channels',
+  validateRequest(createServerChannelSchema),
+  channelsController.createServerChannel,
+);
+
+route.patch(
+  '/:server_id/channels',
+  validateRequest(modifyChannelPositionSchema),
+  channelsController.modifyChannelPosition,
+);
 
 export default route;
