@@ -2,6 +2,11 @@ import express from 'express';
 import meController from '@/controllers/me';
 import serversController from '@/controllers/servers';
 import channelsController from '@/controllers/channels';
+import { validateRequest } from '@/middlewares';
+import {
+  createPrivateChannelSchema,
+  getDMChannelSchema,
+} from '@/schemas/channel.schema';
 const route = express.Router();
 
 route.get('/', meController.getMe); // Get Current User
@@ -16,7 +21,15 @@ route.get('/servers', serversController.getMyServers); // Get Current User Serve
 route.delete('/servers/:server_id', serversController.leaveFromServer); // Leave Server
 
 route.get('/channels', channelsController.getPrivateChannels); // Get Private Channels
-route.post('/channels', channelsController.createPrivateChannel); // Create Private Channel
-route.get('/dms/:user_id', channelsController.getDMChannel); // Get DM Channel
+route.post(
+  '/channels',
+  validateRequest(createPrivateChannelSchema),
+  channelsController.createPrivateChannel,
+); // Create Private Channel
+route.get(
+  '/dms/:user_id',
+  validateRequest(getDMChannelSchema),
+  channelsController.getDMChannel,
+); // Get DM Channel
 
 export default route;

@@ -37,7 +37,7 @@ export const getCallEligibilitySchema = {
   }),
 };
 
-export const createPrivateChannelsSchema = {
+export const createPrivateChannelSchema = {
   body: z.object({
     recipients: z.array(z.string()).min(1).max(100),
     nicks: z
