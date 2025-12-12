@@ -1,6 +1,7 @@
 import { createServer, type Server } from 'http';
 import app from '@/app';
 import config from '@/config';
+import { initSocket } from './socket';
 
 (async function run() {
   try {
@@ -11,7 +12,7 @@ import config from '@/config';
     const server: Server = createServer(app);
 
     // Socket
-    require('@/socket').initialize(server);
+    initSocket(server);
 
     server.listen(config.server.port, () => {
       console.log(`Server running on port ${config.server.port}`);
