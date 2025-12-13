@@ -12,10 +12,10 @@ export const modifyChannelSchema = {
   }),
   body: z.object({
     name: z.string().min(1).max(100),
-    position: z.int().gte(0).optional(),
+    position: z.number().int().gte(0).optional(),
     icon: z.string().optional(),
-    user_limit: z.int().gte(0).lte(99).optional(),
-    flags: z.int().gte(0).optional(),
+    user_limit: z.number().int().gte(0).lte(99).optional(),
+    flags: z.number().int().gte(0).optional(),
   }),
 };
 
@@ -62,15 +62,15 @@ export const getServerChannelsSchema = {
 export const createServerChannelSchema = {
   body: z.object({
     name: z.string().min(1).max(100),
-    type: z.int().gte(0).lte(3),
-    position: z.int().gte(0).lte(1000).optional(),
-    user_limit: z.int().gte(0).lte(99).optional(),
+    type: z.number().int().gte(0).lte(3),
+    position: z.number().int().gte(0).lte(1000).optional(),
+    user_limit: z.number().int().gte(0).lte(99).optional(),
   }),
 };
 
 export const modifyChannelPositionSchema = {
   body: z.object({
     id: z.string(),
-    position: z.int().optional(),
+    position: z.number().int().optional(),
   }),
 };

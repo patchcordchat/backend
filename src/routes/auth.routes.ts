@@ -6,7 +6,7 @@ import sessionsRouter from './sessions.routes';
 
 const route = express.Router();
 
-route.post('/login', validateRequest(loginSchema),  authController.login); // Login Account
+route.post('/login', validateRequest(loginSchema), authController.login); // Login Account
 route.post('/register', validateRequest(registerSchema), authController.register); // Register Account
 
 route.post('/register/phone', authController.registerByPhone); // Register Account with Phone Number

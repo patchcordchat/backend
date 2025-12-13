@@ -22,7 +22,7 @@ const authMiddleware = async (
       res.clearCookie('sid');
       throw new Error('Authentication failed: Invalid session');
     }
-    
+
     // 4. Логика продления сессии (Sliding Expiration)
     const newExpiresAt = await AuthService.refreshSession(session);
     if (newExpiresAt) {

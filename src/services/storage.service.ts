@@ -13,9 +13,14 @@ const client = new S3Client({
     accessKeyId: config.s3.credentials.accessKeyId,
     secretAccessKey: config.s3.credentials.secretAccessKey,
   },
+  forcePathStyle: config.s3.forcePathStyle,
 });
 
-export const uploadFile = async (key: string, body: Buffer, contentType: string) => {
+export const uploadFile = async (
+  key: string,
+  body: Buffer,
+  contentType: string,
+) => {
   const command = new PutObjectCommand({
     Bucket: config.s3.bucket,
     Key: key,

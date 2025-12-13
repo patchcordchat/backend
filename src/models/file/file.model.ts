@@ -31,14 +31,17 @@ const fileSchema = new Schema<IFile>(
     message_id: {
       type: Schema.Types.ObjectId,
       required: true,
+      ref: 'Message',
     },
     user_id: {
       type: Schema.Types.ObjectId,
       required: true,
+      ref: 'User',
     },
     server_id: {
       type: Schema.Types.ObjectId,
       required: true,
+      ref: 'Server',
     },
     created_at: {
       type: Number,

@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import Server from '@/models/server';
-import Channel from '@/models/channel';
+import Channel, { ChannelTypes } from '@/models/channel';
 import { getIO } from '@/socket';
 import { NotFoundError, ApiError } from '@/errors';
 
@@ -112,7 +112,6 @@ export const modifyChannel = async (
 ) => {
   try {
     const channelId = req.params?.channel_id;
-    const userId = req.session?.user_id;
 
     const channel = await Channel.findById(channelId);
     if (!channel) throw new NotFoundError('Channel not found');
@@ -145,25 +144,43 @@ export const deleteChannel = async (
   }
 };
 
-export const getPrivateChannels = (
+export const getPrivateChannels = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   try {
-    res.json({ message: 'Success' });
+    const userId = req.session?.user_id;
+
+    const channels = await Channel.find({
+      recipients: { $in: [userId] },
+      type: ChannelTypes.DM,
+    });
+
+    res.json(channels);
   } catch (error) {
     next(error);
   }
 };
 
-export const createPrivateChannel = (
+export const createPrivateChannel = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   try {
-    res.json({ message: 'Success' });
+    const userId = req.session?.user_id;
+
+    const newChannel = new Channel({
+      ...req.body,
+      recipients: req.body.recipients.push(userId),
+      type: ChannelTypes.DM,
+      owner_id: userId,
+    });
+
+    await newChannel.save();
+
+    res.json(newChannel);
   } catch (error) {
     next(error);
   }
@@ -175,7 +192,15 @@ export const getDMChannel = async (
   next: NextFunction,
 ) => {
   try {
-    res.json({ message: 'Success' });
+    const userId = req.session?.user_id;
+    const recipientId = req.params?.user_id;
+
+    const channel = await Channel.findOne({
+      recipients: { $all: [userId, recipientId] },
+      type: ChannelTypes.DM,
+    });
+
+    res.json(channel);
   } catch (error) {
     next(error);
   }
@@ -188,10 +213,10 @@ export const triggerTyping = async (
 ) => {
   try {
     const channelId = req.params?.channel_id;
-    
+
     const io = getIO();
     io.to(`channel:${channelId}`).emit('typing:start', channelId);
-    
+
     res.json({ message: 'Success' });
   } catch (error) {
     next(error);
