@@ -1,6 +1,7 @@
 import {
   S3Client,
   PutObjectCommand,
+  DeleteObjectCommand,
   ObjectCannedACL,
 } from '@aws-sdk/client-s3';
 import config from '@/config';
@@ -14,13 +15,22 @@ const client = new S3Client({
   },
 });
 
-export const upload = async (key: string, body: Buffer) => {
+export const uploadFile = async (key: string, body: Buffer, contentType: string) => {
   const command = new PutObjectCommand({
     Bucket: config.s3.bucket,
     Key: key,
     Body: body,
-    ContentType: 'image/jpeg',
+    ContentType: contentType,
     ACL: ObjectCannedACL.public_read,
+  });
+
+  await client.send(command);
+};
+
+export const deleteFile = async (key: string) => {
+  const command = new DeleteObjectCommand({
+    Bucket: config.s3.bucket,
+    Key: key,
   });
 
   await client.send(command);
