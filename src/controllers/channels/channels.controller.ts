@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import Server from '@/models/server';
 import Channel from '@/models/channel';
+import { getIO } from '@/socket';
 import { NotFoundError, ApiError } from '@/errors';
 
 export const getServerChannels = async (
@@ -186,6 +187,11 @@ export const triggerTyping = async (
   next: NextFunction,
 ) => {
   try {
+    const channelId = req.params?.channel_id;
+    
+    const io = getIO();
+    io.to(`channel:${channelId}`).emit('typing:start', channelId);
+    
     res.json({ message: 'Success' });
   } catch (error) {
     next(error);

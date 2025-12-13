@@ -1,5 +1,6 @@
 import { BadRequestError, NotFoundError } from '@/errors';
 import Channel from '@/models/channel';
+import { getIO } from '@/socket';
 import Message, { MessageTypes } from '@/models/message';
 import { Request, Response, NextFunction } from 'express';
 
@@ -59,6 +60,9 @@ export const createMessage = async (
 
     await newMessage.populate('author', 'username global_name avatar bot');
 
+    const io = getIO();
+    io.to(`channel:${channelId}`).emit('message:create', newMessage);
+
     res.json(newMessage);
   } catch (error) {
     next(error);
@@ -95,7 +99,7 @@ export const getMessages = async (
     const messages = await Message.find(query)
       .sort({ _id: sortOrder })
       .limit(limit)
-      .populate('author', 'username global_name avatar bot')
+      .populate('author', 'username global_name avatar bot');
 
     if (after) {
       messages.reverse();
@@ -169,6 +173,9 @@ export const modifyMessage = async (
     await message.save();
 
     await message.populate('author', 'username global_name avatar bot');
+
+    const io = getIO();
+    io.to(`channel:${message.channel_id}`).emit('message:update', message);
 
     res.json(message);
   } catch (error) {
@@ -286,7 +293,7 @@ export const modifyDMMessage = async (
     //    }
     //    message.content = content;
     // }
-    
+
     // if (flags !== undefined) {
     //   message.flags = flags;
     // }
