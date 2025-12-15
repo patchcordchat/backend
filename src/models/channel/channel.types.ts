@@ -22,7 +22,8 @@ export interface IChannel extends Document {
   name: string;
   last_message_id?: string;
   user_limit: number;
-  owner_id: Schema.Types.ObjectId;
+  recipients: Schema.Types.ObjectId[];
+  owner: Schema.Types.ObjectId;
   member_count: number;
   flags: ChannelFlags;
   created_at: number;

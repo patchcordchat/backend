@@ -24,7 +24,7 @@ services:
   mongodb:
     image: mongo:4.4
     ports:
-      - ${MONGO_PORT}:27017
+      - ${MONGO_PORT:-27017}:27017
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
@@ -42,9 +42,9 @@ services:
 
   # Redis
   redis:
-    image: redis:latest
+    image: redis:8.4
     ports:
-      - ${REDIS_PORT}:6379
+      - ${REDIS_PORT:-6379}:6379
     volumes:
       - ./.data/cache:/data
     networks:
@@ -56,6 +56,21 @@ services:
       retries: 10
       start_period: 30s
 
+  # Minio 
+  minio:
+    image: minio/minio:RELEASE.2025-09-07T16-13-09Z
+    command: server /data/minio --console-address ":9090"
+    ports:
+      - ${MINIO_PORT:-9000}:9000
+      - ${MINIO_CONSOLE_PORT:-9090}:9090
+    environment:
+      MINIO_ROOT_USER: ${MINIO_USERNAME}
+      MINIO_ROOT_PASSWORD: ${MINIO_PASSWORD}
+    volumes:
+      - './.data/s3:/data/minio'
+    networks:
+      - backend
+
 networks:
-    backend:
-        driver: bridge
+  backend:
+    driver: bridge

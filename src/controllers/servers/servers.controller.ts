@@ -1,9 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
-import {
-  ApiError,
-  BadRequestError,
-  NotFoundError,
-} from '@/errors';
+import { ApiError, BadRequestError, NotFoundError } from '@/errors';
+import { StoragePaths } from '@/utils/storage.paths';
+import { processBase64Image, generateFileHash } from '@/utils/image.utils';
+import { uploadFile } from '@/services/storage.service';
 import Role from '@/models/role';
 import User from '@/models/user';
 import Server from '@/models/server';
@@ -42,6 +41,19 @@ export const createServer = async (
       owner_id: req.session?.user_id,
     });
 
+    if (req.body.icon) {
+      const image = processBase64Image(req.body.icon);
+
+      if (image) {
+        const fileHash = generateFileHash();
+        const key = StoragePaths.serverIcon(newServer._id.toString(), fileHash);
+
+        await uploadFile(key, image.buffer, image.contentType);
+
+        newServer.icon = fileHash;
+      }
+    }
+
     await newServer.save();
 
     const everyoneRole = new Role({
@@ -75,6 +87,19 @@ export const modifyServer = async (
     const serverId = req.params?.server_id;
     if (!serverId) {
       throw new BadRequestError('Invalid request.');
+    }
+
+    if (req.body.icon) {
+      const image = processBase64Image(req.body.icon);
+
+      if (image) {
+        const fileHash = generateFileHash();
+        const key = StoragePaths.serverIcon(serverId, fileHash);
+
+        await uploadFile(key, image.buffer, image.contentType);
+
+        req.body.icon = fileHash;
+      }
     }
 
     const server = await Server.findByIdAndUpdate(serverId, req.body, {
@@ -334,11 +359,14 @@ export const leaveFromServer = async (
       throw new BadRequestError('Owner cannot leave a server.');
     }
 
-    const result = await ServerMember.deleteOne({ server_id: serverId, user_id: userId });
+    const result = await ServerMember.deleteOne({
+      server_id: serverId,
+      user_id: userId,
+    });
     if (result.deletedCount === 0) {
-        return res.json({ message: 'You are not a member of this server' });
+      return res.json({ message: 'You are not a member of this server' });
     }
-    
+
     res.json({ message: 'Success' });
   } catch (error) {
     next(error);

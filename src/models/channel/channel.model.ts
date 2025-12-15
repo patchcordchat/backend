@@ -15,7 +15,7 @@ const channelSchema = new Schema<IChannel>(
     },
     server_id: {
       type: Schema.Types.ObjectId,
-      required: true,
+      ref: 'Server',
     },
     position: {
       type: Number,
@@ -28,13 +28,21 @@ const channelSchema = new Schema<IChannel>(
     },
     last_message_id: {
       type: Schema.Types.ObjectId,
+      ref: 'Message',
     },
     user_limit: {
       type: Number,
     },
-    owner_id: {
+    recipients: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+      },
+    ],
+    owner: {
       type: Schema.Types.ObjectId,
       required: true,
+      ref: 'User',
     },
     member_count: {
       type: Number,

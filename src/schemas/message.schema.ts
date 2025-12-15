@@ -8,8 +8,8 @@ export const getMessageSchema = {
   body: z.object({
     content: z.string().max(2000).optional(),
     tts: z.boolean().optional(),
-    type: z.int().gte(0).lte(9).optional(),
-    flags: z.int().optional(),
+    type: z.number().int().gte(0).lte(9).optional(),
+    flags: z.number().int().optional(),
   }),
 };
 
@@ -20,8 +20,8 @@ export const createMessageSchema = {
   body: z.object({
     content: z.string().max(2000).optional(),
     tts: z.boolean().optional(),
-    type: z.int().gte(0).lte(9).optional(),
-    flags: z.int().optional(),
+    type: z.number().int().gte(0).lte(9).optional(),
+    flags: z.number().int().optional(),
   }),
 };
 
@@ -44,9 +44,9 @@ export const modifyMessageSchema = {
   }),
   body: z.object({
     content: z.string().max(2000).optional(),
-    flags: z.int().optional(),
+    flags: z.number().int().optional(),
   }),
-}
+};
 
 export const getDMMessagesSchema = {
   params: z.object({
@@ -67,10 +67,10 @@ export const createDMMessageSchema = {
   body: z.object({
     content: z.string().max(2000).optional(),
     tts: z.boolean().optional(),
-    type: z.int().gte(0).lte(9).optional(),
-    flags: z.int().optional(),
+    type: z.number().int().gte(0).lte(9).optional(),
+    flags: z.number().int().optional(),
   }),
-}
+};
 
 export const modifyDMMessageSchema = {
   params: z.object({
@@ -79,6 +79,6 @@ export const modifyDMMessageSchema = {
   }),
   body: z.object({
     content: z.string().max(2000).optional(),
-    flags: z.int().optional(),
+    flags: z.number().int().optional(),
   }),
-}
+};

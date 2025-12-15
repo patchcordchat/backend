@@ -25,6 +25,16 @@ interface Config {
       port: number;
     };
   };
+  s3: {
+    region: string;
+    endpoint: string;
+    credentials: {
+      accessKeyId: string;
+      secretAccessKey: string;
+    };
+    forcePathStyle: boolean;
+    bucket: string;
+  };
 }
 
 const config: Config = {
@@ -48,6 +58,16 @@ const config: Config = {
       port: parseInt(process.env.REDIS_PORT || '6379'),
     },
   },
+  s3: {
+    region: process.env.S3_REGION || 'us-east-1',
+    endpoint: process.env.S3_ENDPOINT || 'http://minio:9000',
+    credentials: {
+      accessKeyId: process.env.S3_ACCESS_KEY || 'change-me',
+      secretAccessKey: process.env.S3_SECRET_KEY || 'change-me',
+    },
+    forcePathStyle: true,
+    bucket: process.env.S3_BUCKET || 'patchcord',
+  }
 };
 
 export default config;
