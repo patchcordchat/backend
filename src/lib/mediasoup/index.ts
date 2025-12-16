@@ -3,12 +3,7 @@ import { Worker, Router } from 'mediasoup/node/lib/types';
 import config from '@/config';
 
 let worker: Worker;
-let router: Router;
 
-/**
- * Инициализация Mediasoup Worker и Router
- * Вызывается один раз при старте сервера
- */
 export const initMediasoup = async () => {
   worker = await createWorker({
     logLevel: config.mediasoup.worker.logLevel,
@@ -25,19 +20,11 @@ export const initMediasoup = async () => {
     setTimeout(() => process.exit(1), 2000);
   });
 
-  const { mediaCodecs } = config.mediasoup.router;
-  router = await worker.createRouter({ mediaCodecs });
-
-  console.log('Mediasoup Worker and Router initialized');
+  console.log('Mediasoup Worker initialized');
 };
 
-/**
- * Получить инстанс роутера для создания транспортов в контроллерах
- */
-export const getRouter = (): Router => {
-  if (!router)
-    throw new Error(
-      'Mediasoup router not initialized. Call initMediasoup() first.',
-    );
-  return router;
+export const createRoomRouter = async (): Promise<Router> => {
+  if (!worker) throw new Error('Mediasoup worker not initialized');
+  const { mediaCodecs } = config.mediasoup.router;
+  return await worker.createRouter({ mediaCodecs });
 };
