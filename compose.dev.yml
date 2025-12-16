@@ -8,6 +8,8 @@ services:
       target: dev
     ports:
       - ${SERVER_PORT:-3000}:3000
+      - "10000-10100:10000-10100/udp"
+      - "10000-10100:10000-10100/tcp"
     volumes:
       - .:/app
       - /app/node_modules

@@ -1,5 +1,11 @@
 import dotenv from 'dotenv';
 import { type ConnectOptions } from 'mongoose';
+import {
+  WorkerLogLevel,
+  WorkerLogTag,
+  RouterRtpCodecCapability,
+  TransportListenInfo
+} from 'mediasoup/node/lib/types';
 
 dotenv.config();
 
@@ -35,6 +41,22 @@ interface Config {
     forcePathStyle: boolean;
     bucket: string;
   };
+  mediasoup: {
+    worker: {
+      rtcMinPort: number;
+      rtcMaxPort: number;
+      logLevel: WorkerLogLevel;
+      logTags: WorkerLogTag[];
+    };
+    router: {
+      mediaCodecs: RouterRtpCodecCapability[];
+    };
+    webRtcTransport: {
+      listenIps: TransportListenInfo[];
+      maxIncomingBitrate: number;
+      initialAvailableOutgoingBitrate: number;
+    };
+  };
 }
 
 const config: Config = {
@@ -67,7 +89,44 @@ const config: Config = {
     },
     forcePathStyle: true,
     bucket: process.env.S3_BUCKET || 'patchcord',
-  }
+  },
+  mediasoup: {
+    worker: {
+      rtcMinPort: 10000,
+      rtcMaxPort: 10100,
+      logLevel: 'warn',
+      logTags: ['info', 'ice', 'dtls', 'rtp', 'srtp', 'rtcp'],
+    },
+    router: {
+      mediaCodecs: [
+        {
+          kind: 'audio',
+          mimeType: 'audio/opus',
+          clockRate: 48000,
+          channels: 2,
+        },
+        {
+          kind: 'video',
+          mimeType: 'video/VP8',
+          clockRate: 90000,
+          parameters: {
+            'x-google-start-bitrate': 1000,
+          },
+        },
+      ],
+    },
+    webRtcTransport: {
+      listenIps: [
+        {
+          ip: '0.0.0.0',
+          announcedIp: undefined,
+          protocol: 'udp',
+        },
+      ],
+      maxIncomingBitrate: 1500000,
+      initialAvailableOutgoingBitrate: 1000000,
+    },
+  },
 };
 
 export default config;
