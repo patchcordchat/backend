@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { ApiError, BadRequestError, NotFoundError } from '@/errors';
-import { StoragePaths } from '@/utils/storage.paths';
+import { StoragePaths } from '@/utils/storage.utils';
 import { processBase64Image, generateFileHash } from '@/utils/image.utils';
 import { uploadFile } from '@/services/storage.service';
 import Role from '@/models/role';
@@ -340,7 +340,6 @@ export const getMyServers = async (
     next(error);
   }
 };
-
 export const leaveFromServer = async (
   req: Request,
   res: Response,

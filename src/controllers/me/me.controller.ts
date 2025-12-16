@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import User from '@/models/user';
-import { StoragePaths } from '@/utils/storage.paths';
+import { StoragePaths } from '@/utils/storage.utils';
 import { processBase64Image, generateFileHash } from '@/utils/image.utils';
 import { uploadFile } from '@/services/storage.service';
 
