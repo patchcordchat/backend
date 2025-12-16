@@ -1,12 +1,12 @@
 import express from 'express';
+import morgan from 'morgan';
+import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import config from '@/config';
 import { errorMiddleware, authMiddleware } from '@/middlewares';
 import { userRoutes, serverRoutes, channelRoutes, authRoutes } from '@/routes';
 
 const app = express();
-const cors = require('cors');
-const morgan = require('morgan');
-const cookieParser = require('cookie-parser');
 
 app.use(cors());
 app.use(morgan('tiny'));
