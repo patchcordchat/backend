@@ -221,18 +221,17 @@ export const registerWebRtcHandlers = (socket: Socket) => {
   /**
    * 6. RESUME: Запуск потока после consume
    */
-  socket.on('webrtc:resume', async (data: { consumerId: string }, callback) => {
+  socket.on('webrtc:resume', async (data: { consumerId: string }) => {
     try {
       if (!currentChannelId) return;
       const peer = state.getPeer(currentChannelId, socket.id);
       const consumer = peer?.consumers.get(data.consumerId);
-
+      
       if (consumer) {
         await consumer.resume();
       }
-      callback();
     } catch (error) {
-      callback({ error: 'Resume failed' });
+      console.log(error);      
     }
   });
 

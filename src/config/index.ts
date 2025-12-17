@@ -4,7 +4,7 @@ import {
   WorkerLogLevel,
   WorkerLogTag,
   RouterRtpCodecCapability,
-  TransportListenInfo
+  TransportListenInfo,
 } from 'mediasoup/node/lib/types';
 
 dotenv.config();
@@ -119,7 +119,7 @@ const config: Config = {
       listenIps: [
         {
           ip: '0.0.0.0',
-          announcedIp: undefined,
+          announcedIp: process.env.WEBRTC_ANNOUNCED_IP || '127.0.0.1',
           protocol: 'udp',
         },
       ],
