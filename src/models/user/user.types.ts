@@ -1,8 +1,8 @@
-import { Schema, type Document, Model, HydratedDocument } from 'mongoose';
+import { Types, type Document, Model, HydratedDocument } from 'mongoose';
 
 export interface IUser extends Document {
-  _id: Schema.Types.ObjectId;
-  id: Schema.Types.ObjectId;
+  _id: Types.ObjectId;
+  id: Types.ObjectId;
   username: string;
   global_name?: string;
   avatar?: string;

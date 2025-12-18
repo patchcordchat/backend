@@ -1,4 +1,4 @@
-import { Schema, type Document } from 'mongoose';
+import { Types, type Document } from 'mongoose';
 
 export enum ChannelTypes {
   TEXT = 0,
@@ -14,16 +14,16 @@ export enum ChannelFlags {
 }
 
 export interface IChannel extends Document {
-  _id: Schema.Types.ObjectId;
-  id: Schema.Types.ObjectId;
+  _id: Types.ObjectId;
+  id: Types.ObjectId;
   type: ChannelTypes;
-  server_id: Schema.Types.ObjectId;
+  server_id: Types.ObjectId;
   position: number;
   name: string;
   last_message_id?: string;
   user_limit: number;
-  recipients: Schema.Types.ObjectId[];
-  owner: Schema.Types.ObjectId;
+  recipients: Types.ObjectId[];
+  owner: Types.ObjectId;
   member_count: number;
   flags: ChannelFlags;
   created_at: number;

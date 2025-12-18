@@ -1,4 +1,4 @@
-import { Schema } from 'mongoose';
+import { Types } from 'mongoose';
 
 export enum InviteTypes {
   SERVER = 0,
@@ -7,10 +7,10 @@ export enum InviteTypes {
 }
 
 export interface IInvite {
-  _id: Schema.Types.ObjectId;
-  id: Schema.Types.ObjectId;
-  channel_id: Schema.Types.ObjectId;
-  inviter_id: Schema.Types.ObjectId;
+  _id: Types.ObjectId;
+  id: Types.ObjectId;
+  channel_id: Types.ObjectId;
+  inviter_id: Types.ObjectId;
   code: string;
   type: InviteTypes;
   expires_at: number;

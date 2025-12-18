@@ -1,4 +1,4 @@
-import { Schema } from 'mongoose';
+import { Types } from 'mongoose';
 
 export enum RolePermissions {
   NONE = 0,
@@ -26,9 +26,9 @@ export enum RolePermissions {
 }
 
 export interface IRole {
-  _id: Schema.Types.ObjectId;
-  id: Schema.Types.ObjectId;
-  server_id: Schema.Types.ObjectId;
+  _id: Types.ObjectId;
+  id: Types.ObjectId;
+  server_id: Types.ObjectId;
   name: string;
   permissions: RolePermissions;
   created_at: number;

@@ -1,16 +1,16 @@
-import { Schema } from 'mongoose';
+import { Types } from 'mongoose';
 
 export interface IFile {
-  _id: Schema.Types.ObjectId;
-  id: Schema.Types.ObjectId;
+  _id: Types.ObjectId;
+  id: Types.ObjectId;
   filename: string;
   content_type?: string;
   size: number;
   url: string;
   deleted: boolean;
-  message_id: Schema.Types.ObjectId;
-  user_id: Schema.Types.ObjectId;
-  server_id: Schema.Types.ObjectId;
+  message_id: Types.ObjectId;
+  user_id: Types.ObjectId;
+  server_id: Types.ObjectId;
   created_at: number;
   updated_at: number;
 }
