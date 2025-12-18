@@ -1,7 +1,7 @@
 services:
   # NodeJS Backend
   api:
-    image: fizis/patchcord-api:latest
+    image: patchcord/backend:latest
     ports:
       - ${SERVER_PORT:-3000}:3000
       - ${RTC_MIN_PORT:-10000}-${RTC_MAX_PORT:-10100}:10000-10100/udp
