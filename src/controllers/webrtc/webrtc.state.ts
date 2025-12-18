@@ -1,7 +1,13 @@
-import { Router, Transport, Producer, Consumer, WebRtcTransport } from 'mediasoup/node/lib/types';
+import {
+  Router,
+  Transport,
+  Producer,
+  Consumer,
+} from 'mediasoup/node/lib/types';
 
 export interface Peer {
   socketId: string;
+  userId: string; // Добавили userId
   transports: Map<string, Transport>;
   producers: Map<string, Producer>;
   consumers: Map<string, Consumer>;
@@ -10,22 +16,20 @@ export interface Peer {
 export interface Room {
   id: string;
   router: Router;
-  peers: Map<string, Peer>;
+  peers: Map<string, Peer>; // Ключ — socketId (для быстрого доступа при разрыве)
 }
 
-// Хранилище всех активных комнат (каналов)
-// channelId -> Room
-const rooms: Map<string, Room> = new Map();
+const rooms = new Map<string, Room>();
 
-export const getRoom = (channelId: string) => rooms.get(channelId);
+export const getRoom = (roomId: string) => rooms.get(roomId);
 
-export const addRoom = (channelId: string, router: Router): Room => {
+export const addRoom = (roomId: string, router: Router) => {
   const room: Room = {
-    id: channelId,
+    id: roomId,
     router,
     peers: new Map(),
   };
-  rooms.set(channelId, room);
+  rooms.set(roomId, room);
   return room;
 };
 
@@ -37,41 +41,54 @@ export const removeRoom = (channelId: string) => {
   }
 };
 
+export const getPeerByUserId = (
+  roomId: string,
+  userId: string,
+): Peer | undefined => {
+  const room = rooms.get(roomId);
+  if (!room) return undefined;
+  for (const peer of room.peers.values()) {
+    if (peer.userId === userId) return peer;
+  }
+  return undefined;
+};
+
 export const getPeer = (channelId: string, socketId: string) => {
   return rooms.get(channelId)?.peers.get(socketId);
 };
 
-export const createPeer = (channelId: string, socketId: string): Peer => {
-  const room = rooms.get(channelId);
-  if (!room) throw new Error('Room not found');
+export const createPeer = (
+  roomId: string,
+  socketId: string,
+  userId: string,
+) => {
+  const room = rooms.get(roomId);
+  if (!room) return null;
 
   const peer: Peer = {
     socketId,
+    userId,
     transports: new Map(),
     producers: new Map(),
     consumers: new Map(),
   };
-  
+
   room.peers.set(socketId, peer);
   return peer;
 };
 
-export const removePeer = (channelId: string, socketId: string) => {
-  const room = rooms.get(channelId);
-  if (!room) return;
-
-  const peer = room.peers.get(socketId);
-  if (peer) {
-    // Закрываем всё, что связано с пиром
-    peer.producers.forEach((p) => p.close());
-    peer.consumers.forEach((c) => c.close());
-    peer.transports.forEach((t) => t.close());
+export const removePeer = (roomId: string, socketId: string) => {
+  const room = rooms.get(roomId);
+  if (room) {
+    const peer = room.peers.get(socketId);
+    // Важно: закрыть все транспорты mediasoup, чтобы освободить память
+    peer?.transports.forEach((t) => t.close());
     room.peers.delete(socketId);
-  }
 
-  // Если комната пуста — удаляем её, чтобы не висела в памяти
-  if (room.peers.size === 0) {
-    removeRoom(channelId);
-    console.log(`Room ${channelId} closed (empty)`);
+    // Если комната пуста — можно удалить и комнату (опционально)
+    if (room.peers.size === 0) {
+      room.router.close();
+      rooms.delete(roomId);
+    }
   }
 };

@@ -65,19 +65,19 @@ const config: Config = {
     key: process.env.APP_KEY || 'change-me',
   },
   server: {
-    port: Number(process.env.PORT) || 3000,
+    port: Number(process.env.SERVER_PORT) || 3000,
   },
   database: {
     mongodb: {
       host: process.env.MONGO_HOST || 'localhost',
       port: process.env.MONGO_PORT || '27017',
       username: process.env.MONGO_USERNAME || 'patchcord',
-      password: process.env.MONGO_PASSWORD || 'patchcord',
+      password: process.env.MONGO_PASSWORD || 'change-me',
       database: process.env.MONGO_DATABASE || 'patchcord',
     },
     redis: {
       host: process.env.REDIS_HOST || 'localhost',
-      port: parseInt(process.env.REDIS_PORT || '6379'),
+      port: Number(process.env.REDIS_PORT) || 6379,
     },
   },
   s3: {
@@ -119,7 +119,7 @@ const config: Config = {
       listenIps: [
         {
           ip: '0.0.0.0',
-          announcedIp: process.env.WEBRTC_ANNOUNCED_IP || '127.0.0.1',
+          announcedIp: process.env.MEDIASOUP_ANNOUNCED_IP || 'localhost',
           protocol: 'udp',
         },
       ],

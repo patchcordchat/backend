@@ -24,7 +24,8 @@ export const initMediasoup = async () => {
 };
 
 export const createRoomRouter = async (): Promise<Router> => {
-  if (!worker) throw new Error('Mediasoup worker not initialized');
-  const { mediaCodecs } = config.mediasoup.router;
-  return await worker.createRouter({ mediaCodecs });
+  const mediaCodecs = config.mediasoup.router.mediaCodecs;
+  const router = await worker.createRouter({ mediaCodecs });
+
+  return router;
 };
