@@ -13,6 +13,10 @@ COPY package*.json ./
 FROM base AS deps
 RUN npm install
 
+FROM deps AS dev
+RUN apk add --no-cache openssl-dev
+CMD ["npm", "run", "dev"]
+
 FROM base AS builder
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .

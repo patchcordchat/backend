@@ -18,10 +18,10 @@ app.use(
 app.use(cookieParser(config.app.key));
 
 // Routes
-app.use('/api/users', authMiddleware, userRoutes);
-app.use('/api/servers', authMiddleware, serverRoutes);
-app.use('/api/channels', authMiddleware, channelRoutes);
-app.use('/api/auth', authRoutes);
+app.use('/users', authMiddleware, userRoutes);
+app.use('/servers', authMiddleware, serverRoutes);
+app.use('/channels', authMiddleware, channelRoutes);
+app.use('/auth', authRoutes);
 app.use(errorMiddleware);
 
 export default app;
