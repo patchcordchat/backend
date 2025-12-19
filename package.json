@@ -21,7 +21,6 @@
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
-    "dotenv": "^17.2.3",
     "express": "^5.2.1",
     "ioredis": "^5.8.2",
     "mediasoup": "^3.19.14",

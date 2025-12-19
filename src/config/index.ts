@@ -1,4 +1,3 @@
-import dotenv from 'dotenv';
 import { type ConnectOptions } from 'mongoose';
 import {
   WorkerLogLevel,
@@ -6,8 +5,6 @@ import {
   RouterRtpCodecCapability,
   TransportListenInfo,
 } from 'mediasoup/node/lib/types';
-
-dotenv.config();
 
 interface Config {
   nodeEnv: string;
