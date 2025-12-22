@@ -9,7 +9,7 @@ import { userRoutes, serverRoutes, channelRoutes, authRoutes } from '@/routes';
 const app = express();
 
 app.use(cors());
-app.use(morgan('tiny'));
+app.use(morgan(config.nodeEnv === 'development' ? 'dev' : 'tiny'));
 app.use(
   express.json({
     limit: '50mb',

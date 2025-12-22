@@ -6,6 +6,8 @@ services:
       - ${SERVER_PORT:-3000}:3000
       - ${RTC_MIN_PORT:-10000}-${RTC_MAX_PORT:-10100}:10000-10100/udp
       - ${RTC_MIN_PORT:-10000}-${RTC_MAX_PORT:-10100}:10000-10100/tcp
+    env_file:
+      - .env
     restart: always
     networks:
       - backend
