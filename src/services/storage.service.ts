@@ -10,8 +10,8 @@ const client = new S3Client({
   region: config.s3.region,
   endpoint: config.s3.endpoint,
   credentials: {
-    accessKeyId: config.s3.credentials.accessKeyId,
-    secretAccessKey: config.s3.credentials.secretAccessKey,
+    accessKeyId: config.s3.accessKey,
+    secretAccessKey: config.s3.secretKey,
   },
   forcePathStyle: config.s3.forcePathStyle,
 });

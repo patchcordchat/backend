@@ -39,7 +39,7 @@ const channelSchema = new Schema<IChannel>(
         ref: 'User',
       },
     ],
-    owner: {
+    owner_id: {
       type: Schema.Types.ObjectId,
       required: true,
       ref: 'User',

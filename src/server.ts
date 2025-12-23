@@ -2,11 +2,16 @@ import { createServer, type Server } from 'http';
 import app from '@/app';
 import config from '@/config';
 import { initSocket } from './socket';
+import { initMongoose } from './lib/mongoose';
+import { initMediasoup } from './lib/mediasoup';
 
 (async function run() {
   try {
     // Mongoose
-    await require('@/lib/mongoose').connect();
+    await initMongoose();
+
+    // Mediasoup
+    await initMediasoup();
 
     // Server
     const server: Server = createServer(app);
@@ -14,8 +19,8 @@ import { initSocket } from './socket';
     // Socket
     initSocket(server);
 
-    server.listen(config.server.port, () => {
-      console.log(`Server running on port ${config.server.port}`);
+    server.listen(config.app.port, () => {
+      console.log(`Server running on port ${config.app.port}`);
     });
   } catch (error) {
     console.error('Failed to start server:', error);

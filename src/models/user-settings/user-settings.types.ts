@@ -1,4 +1,4 @@
-import { Schema } from 'mongoose';
+import { Types } from 'mongoose';
 
 export enum UserStatus {
   OFFLINE = 'offline',
@@ -16,8 +16,8 @@ export enum UserTheme {
 }
 
 export interface IUserSettings {
-  _id: Schema.Types.ObjectId;
-  user_id: Schema.Types.ObjectId;
+  _id: Types.ObjectId;
+  user_id: Types.ObjectId;
   theme: string;
   locale: string;
   status: string;

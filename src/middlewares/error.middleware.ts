@@ -7,8 +7,6 @@ const errorMiddleware = (
   res: Response,
   next: NextFunction,
 ) => {
-  console.error('Error:', err);
-
   const status = err.status ?? 500;
   const message =
     status >= 500 ? 'Internal Server Error' : (err.message ?? 'Error');
@@ -21,6 +19,10 @@ const errorMiddleware = (
 
   if (err instanceof ApiError && err.code) {
     response.error.code = err.code;
+  }
+
+  if (status === 500) {
+    console.error(err);
   }
 
   res.status(status).json(response);

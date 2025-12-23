@@ -1,4 +1,4 @@
-import { Schema, type Document } from 'mongoose';
+import { Types, type Document } from 'mongoose';
 
 export enum MessageTypes {
   DEFAULT = 0,
@@ -27,15 +27,15 @@ export interface IReaction {
 }
 
 export interface IMessage extends Document {
-  _id: Schema.Types.ObjectId;
-  id: Schema.Types.ObjectId;
-  channel_id: Schema.Types.ObjectId;
-  author: Schema.Types.ObjectId;
+  _id: Types.ObjectId;
+  id: Types.ObjectId;
+  channel_id: Types.ObjectId;
+  author: Types.ObjectId;
   content: string;
   timestamp: number;
   edited_timestamp: number | null;
   tts: boolean;
-  attachments: Schema.Types.ObjectId[];
+  attachments: Types.ObjectId[];
   reactions: IReaction[];
   pinned: boolean;
   type: MessageTypes;

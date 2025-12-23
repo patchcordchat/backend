@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { AuthService } from '@/services/auth.service';
 import { UnauthorizedError, ApiError } from '@/errors';
+import config from '@/config';
 import User from '@/models/user';
 
 const setSessionCookie = (
@@ -10,6 +11,7 @@ const setSessionCookie = (
 ) => {
   res.cookie('sid', sessionId, {
     httpOnly: true,
+    secure: config.app.env === 'production',
     signed: true,
     expires: new Date(expiresAt),
     sameSite: 'lax',

@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { AuthService } from '@/services/auth.service';
+import { UnauthorizedError } from '@/errors';
 
 const authMiddleware = async (
   req: Request,
@@ -11,7 +12,7 @@ const authMiddleware = async (
     const sessionId = req.signedCookies['sid'] || req.cookies['sid'];
 
     if (!sessionId) {
-      throw new Error('Authentication failed: Session missing');
+      throw new UnauthorizedError();
     }
 
     // 2. Ищем сессию через сервис
@@ -20,7 +21,7 @@ const authMiddleware = async (
     if (!session) {
       // Если кука есть, а сессии нет - чистим куку
       res.clearCookie('sid');
-      throw new Error('Authentication failed: Invalid session');
+      throw new UnauthorizedError();
     }
 
     // 4. Логика продления сессии (Sliding Expiration)
