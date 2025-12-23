@@ -34,7 +34,7 @@ services:
     networks:
       - backend
     healthcheck:
-      test: ["CMD", "mongo", "--eval", "db.runCommand('ping').ok"]
+      test: [ "CMD", "mongo", "--eval", "db.runCommand('ping').ok" ]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -51,7 +51,7 @@ services:
     networks:
       - backend
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: [ "CMD", "redis-cli", "ping" ]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -72,7 +72,7 @@ services:
     networks:
       - backend
     healthcheck:
-      test: ["CMD", "mc", "ready", "local"]
+      test: [ "CMD", "mc", "ready", "local" ]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -96,6 +96,7 @@ volumes:
   mongodb_data:
   redis_data:
   s3_data:
+
 
 networks:
   backend:
