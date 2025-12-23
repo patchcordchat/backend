@@ -23,7 +23,7 @@ export interface IChannel extends Document {
   last_message_id?: string;
   user_limit: number;
   recipients: Types.ObjectId[];
-  owner: Types.ObjectId;
+  owner_id: Types.ObjectId;
   member_count: number;
   flags: ChannelFlags;
   created_at: number;

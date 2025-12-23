@@ -19,8 +19,8 @@ import { initMediasoup } from './lib/mediasoup';
     // Socket
     initSocket(server);
 
-    server.listen(config.server.port, () => {
-      console.log(`Server running on port ${config.server.port}`);
+    server.listen(config.app.port, () => {
+      console.log(`Server running on port ${config.app.port}`);
     });
   } catch (error) {
     console.error('Failed to start server:', error);

@@ -6,7 +6,7 @@ import * as state from './webrtc.state';
 
 const createWebRtcTransport = async (router: Router) => {
   const { maxIncomingBitrate, initialAvailableOutgoingBitrate, listenIps } =
-    config.mediasoup.webRtcTransport;
+    config.mediasoup.transport;
 
   const transport = await router.createWebRtcTransport({
     listenIps,

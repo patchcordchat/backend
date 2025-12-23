@@ -9,13 +9,13 @@ import { userRoutes, serverRoutes, channelRoutes, authRoutes } from '@/routes';
 const app = express();
 
 app.use(cors());
-app.use(morgan(config.nodeEnv === 'development' ? 'dev' : 'tiny'));
+app.use(morgan(config.app.env === 'development' ? 'dev' : 'tiny'));
 app.use(
   express.json({
     limit: '50mb',
   }),
 );
-app.use(cookieParser(config.app.key));
+app.use(cookieParser(config.app.secretKey));
 
 // Routes
 app.use('/users', authMiddleware, userRoutes);

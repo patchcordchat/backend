@@ -11,7 +11,7 @@ const setSessionCookie = (
 ) => {
   res.cookie('sid', sessionId, {
     httpOnly: true,
-    secure: config.nodeEnv === 'production',
+    secure: config.app.env === 'production',
     signed: true,
     expires: new Date(expiresAt),
     sameSite: 'lax',

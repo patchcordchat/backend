@@ -36,7 +36,7 @@ export function initSocket(server: Server): void {
 
     let sessionId = rawSid;
     if (rawSid.startsWith('s:')) {
-      const unsigned = unsign(rawSid.slice(2), config.app.key);
+      const unsigned = unsign(rawSid.slice(2), config.app.secretKey);
       if (unsigned === false) {
         return next(new Error('Unauthorized'));
       }

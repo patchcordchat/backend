@@ -5,7 +5,7 @@ import config from '@/config';
 mongoose.Promise = global.Promise;
 
 const { host, port, username, password, database, options } =
-  config.database.mongodb;
+  config.db.mongodb;
 
 export async function initMongoose(): Promise<void> {
   const uri = `mongodb://${username}:${password}@${host}:${port}/${database}?authSource=admin`;
