@@ -1,5 +1,5 @@
 import { Schema, model, Types } from 'mongoose';
-import { IFile } from './file.types';
+import { IFile } from './attachment.types';
 import { toJSONPlugin } from '../plugins/toJSON.plugin';
 
 const fileSchema = new Schema<IFile>(
@@ -23,25 +23,6 @@ const fileSchema = new Schema<IFile>(
     url: {
       type: String,
       required: true,
-    },
-    deleted: {
-      type: Boolean,
-      default: false,
-    },
-    message_id: {
-      type: Schema.Types.ObjectId,
-      required: true,
-      ref: 'Message',
-    },
-    user_id: {
-      type: Schema.Types.ObjectId,
-      required: true,
-      ref: 'User',
-    },
-    server_id: {
-      type: Schema.Types.ObjectId,
-      required: true,
-      ref: 'Server',
     },
     created_at: {
       type: Number,

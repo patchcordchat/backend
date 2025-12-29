@@ -11,7 +11,7 @@ export const modifyChannelSchema = {
     channel_id: z.string(),
   }),
   body: z.object({
-    name: z.string().min(1).max(100),
+    name: z.string().trim().min(1).max(100),
     position: z.number().int().gte(0).optional(),
     icon: z.string().optional(),
     user_limit: z.number().int().gte(0).lte(99).optional(),
@@ -41,7 +41,7 @@ export const createPrivateChannelSchema = {
   body: z.object({
     recipients: z.array(z.string()).min(1).max(100),
     nicks: z
-      .array(z.object({ id: z.string(), nick: z.string() }))
+      .array(z.object({ id: z.string(), nick: z.string().trim() }))
       .min(1)
       .max(100),
   }),
@@ -61,7 +61,7 @@ export const getServerChannelsSchema = {
 
 export const createServerChannelSchema = {
   body: z.object({
-    name: z.string().min(1).max(100),
+    name: z.string().trim().min(1).max(100),
     type: z.number().int().gte(0).lte(3),
     position: z.number().int().gte(0).lte(1000).optional(),
     user_limit: z.number().int().gte(0).lte(99).optional(),

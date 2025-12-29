@@ -8,7 +8,11 @@ import { userRoutes, serverRoutes, channelRoutes, authRoutes } from '@/routes';
 
 const app = express();
 
-app.use(cors());
+app.use(
+  cors({
+    origin: config.app.env === 'development' ? '*' : config.app.clientUrl,
+  }),
+);
 app.use(morgan(config.app.env === 'development' ? 'dev' : 'tiny'));
 app.use(
   express.json({

@@ -6,7 +6,7 @@ export const getMessageSchema = {
     message_id: z.string(),
   }),
   body: z.object({
-    content: z.string().max(2000).optional(),
+    content: z.string().trim().max(2000).optional(),
     tts: z.boolean().optional(),
     type: z.number().int().gte(0).lte(9).optional(),
     flags: z.number().int().optional(),
@@ -18,7 +18,7 @@ export const createMessageSchema = {
     channel_id: z.string(),
   }),
   body: z.object({
-    content: z.string().max(2000).optional(),
+    content: z.string().trim().max(2000).optional(),
     tts: z.boolean().optional(),
     type: z.number().int().gte(0).lte(9).optional(),
     flags: z.number().int().optional(),
@@ -43,7 +43,7 @@ export const modifyMessageSchema = {
     message_id: z.string(),
   }),
   body: z.object({
-    content: z.string().max(2000).optional(),
+    content: z.string().trim().max(2000).optional(),
     flags: z.number().int().optional(),
   }),
 };
@@ -65,7 +65,7 @@ export const createDMMessageSchema = {
     user_id: z.string(),
   }),
   body: z.object({
-    content: z.string().max(2000).optional(),
+    content: z.string().trim().max(2000).optional(),
     tts: z.boolean().optional(),
     type: z.number().int().gte(0).lte(9).optional(),
     flags: z.number().int().optional(),
@@ -78,7 +78,7 @@ export const modifyDMMessageSchema = {
     message_id: z.string(),
   }),
   body: z.object({
-    content: z.string().max(2000).optional(),
+    content: z.string().trim().max(2000).optional(),
     flags: z.number().int().optional(),
   }),
 };

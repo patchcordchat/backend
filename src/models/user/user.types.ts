@@ -13,6 +13,7 @@ export interface IUser extends Document {
   email?: string;
   phone?: string;
   flags: number;
+  date_of_birth?: Date;
   public_flags: number;
   password: string;
   tokens: { token: string }[];

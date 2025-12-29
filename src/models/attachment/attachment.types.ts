@@ -7,10 +7,6 @@ export interface IFile {
   content_type?: string;
   size: number;
   url: string;
-  deleted: boolean;
-  message_id: Types.ObjectId;
-  user_id: Types.ObjectId;
-  server_id: Types.ObjectId;
   created_at: number;
   updated_at: number;
 }

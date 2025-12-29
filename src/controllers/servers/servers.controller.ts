@@ -8,11 +8,7 @@ import User from '@/models/user';
 import Server from '@/models/server';
 import ServerMember from '@/models/server-member';
 
-export const getServer = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+export const getServer = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const serverId = req.params?.server_id;
     if (!serverId) {
@@ -30,11 +26,7 @@ export const getServer = async (
   }
 };
 
-export const createServer = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+export const createServer = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const newServer = new Server({
       ...req.body,
@@ -78,11 +70,7 @@ export const createServer = async (
   }
 };
 
-export const modifyServer = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+export const modifyServer = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const serverId = req.params?.server_id;
     if (!serverId) {
@@ -115,11 +103,7 @@ export const modifyServer = async (
   }
 };
 
-export const deleteServer = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+export const deleteServer = async (req: Request, res: Response, next: NextFunction) => {
   const serverId = req.params?.server_id;
 
   try {
@@ -137,11 +121,7 @@ export const deleteServer = async (
   }
 };
 
-export const getServerPreview = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+export const getServerPreview = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const serverId = req.params?.server_id;
 
@@ -168,11 +148,7 @@ export const getServerPreview = async (
   }
 };
 
-export const getServerMembers = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+export const getServerMembers = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const serverId = req.params?.server_id;
 
@@ -192,11 +168,7 @@ export const getServerMembers = async (
   }
 };
 
-export const searchServerMembers = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+export const searchServerMembers = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const serverId = req.params?.server_id;
     const query = req.query?.query as string;
@@ -224,11 +196,7 @@ export const searchServerMembers = async (
   }
 };
 
-export const joinServer = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+export const joinServer = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const serverId = req.params?.server_id;
     const userId = req.session?.user_id;
@@ -259,11 +227,7 @@ export const joinServer = async (
   }
 };
 
-export const addServerMember = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+export const addServerMember = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const serverId = req.params?.server_id;
     const userIdToAdd = req.params?.user_id;
@@ -299,11 +263,7 @@ export const addServerMember = async (
   }
 };
 
-export const getServerRoles = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+export const getServerRoles = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const serverId = req.params?.server_id;
 
@@ -320,17 +280,11 @@ export const getServerRoles = async (
   }
 };
 
-export const getMyServers = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+export const getMyServers = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userId = req.session?.user_id;
 
-    const memberEntries = await ServerMember.find({ user_id: userId }).select(
-      'server_id',
-    );
+    const memberEntries = await ServerMember.find({ user_id: userId }).select('server_id');
     const serverIds = memberEntries.map((entry) => entry.server_id);
 
     const servers = await Server.find({ _id: { $in: serverIds } });
@@ -340,11 +294,7 @@ export const getMyServers = async (
     next(error);
   }
 };
-export const leaveFromServer = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+export const leaveFromServer = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const serverId = req.params?.server_id;
     const userId = req.session?.user_id;

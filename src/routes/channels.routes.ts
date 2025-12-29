@@ -18,16 +18,8 @@ import messagesController from '@/controllers/messages';
 
 const route = express.Router();
 
-route.get(
-  '/:channel_id',
-  validateRequest(getChannelSchema),
-  channelsController.getChannel,
-); // Get Channel
-route.patch(
-  '/:channel_id',
-  validateRequest(modifyChannelSchema),
-  channelsController.modifyChannel,
-); // Modify Channel
+route.get('/:channel_id', validateRequest(getChannelSchema), channelsController.getChannel); // Get Channel
+route.patch('/:channel_id', validateRequest(modifyChannelSchema), channelsController.modifyChannel); // Modify Channel
 route.delete(
   '/:channel_id',
   validateRequest(deleteChannelSchema),
