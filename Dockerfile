@@ -1,4 +1,4 @@
-FROM node:25-alpine AS base
+FROM node:25-alpine AS builder
 RUN apk add --no-cache \
     python3 \
     py3-pip \
@@ -9,16 +9,7 @@ RUN apk add --no-cache \
     openssl-dev
 WORKDIR /app
 COPY package*.json ./
-
-FROM base AS deps
 RUN npm install
-
-FROM deps AS dev
-RUN apk add --no-cache openssl-dev
-CMD ["npm", "run", "dev"]
-
-FROM base AS builder
-COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN npm run build
 RUN npm prune --production

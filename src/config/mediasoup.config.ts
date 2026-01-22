@@ -30,8 +30,8 @@ export interface IMediasoupConfig {
 
 const config: IMediasoupConfig = {
   worker: {
-    rtcMinPort: Number(process.env.RTC_MAX_PORT) || 10000,
-    rtcMaxPort: Number(process.env.RTC_MAX_PORT) || 10100,
+    rtcMinPort: 10000,
+    rtcMaxPort: 10100,
     logLevel: 'warn',
     logTags: ['info', 'ice', 'dtls', 'rtp', 'srtp', 'rtcp'],
   },
