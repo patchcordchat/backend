@@ -1,17 +1,23 @@
-import { Schema, model } from 'mongoose';
+import { Schema, Types, model } from 'mongoose';
 import { ISession } from './session.types';
 
 const sessionSchema = new Schema<ISession>(
   {
-    id: {
-      type: String,
-      required: true,
-      unique: true,
+    _id: {
+      type: Schema.Types.ObjectId,
+      default: () => new Types.ObjectId(),
     },
     user_id: {
       type: Schema.Types.ObjectId,
       ref: 'User',
       required: true,
+      index: true,
+    },
+    token: {
+      type: String,
+      required: true,
+      unique: true,
+      index: true,
     },
     client_info: {
       os: { type: String, default: 'Unknown' },
@@ -29,6 +35,7 @@ const sessionSchema = new Schema<ISession>(
     _ttl: {
       type: Date,
       select: false,
+      expires: 0,
     },
     created_at: {
       type: Number,
@@ -51,8 +58,6 @@ const sessionSchema = new Schema<ISession>(
     versionKey: false,
   },
 );
-
-sessionSchema.index({ _ttl: 1 }, { expireAfterSeconds: 0 });
 
 sessionSchema.pre('save', function (next) {
   if (this.isModified('expires_at')) {

@@ -1,28 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
-import { AuthService } from '@/services/auth.service';
+import { createSession, deleteSession } from '@/services/auth.service';
 import { UnauthorizedError, ApiError } from '@/errors';
-import config from '@/config';
 import User from '@/models/user';
 
-const setSessionCookie = (
-  res: Response,
-  sessionId: string,
-  expiresAt: number,
-) => {
-  res.cookie('sid', sessionId, {
-    httpOnly: true,
-    secure: config.app.env === 'production',
-    signed: true,
-    expires: new Date(expiresAt),
-    sameSite: 'lax',
-  });
-};
-
-export const login = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+export const login = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { email, password } = req.body;
 
@@ -30,30 +11,22 @@ export const login = async (
     if (!user) throw new UnauthorizedError('Invalid login or password');
 
     // Создаем сессию
-    const ip = req.ip || req.socket.remoteAddress || '';
-    const userAgent = req.headers['user-agent'] || '';
+    const ip = req.ip || req.socket.remoteAddress || 'Unknown';
+    const userAgent = req.headers['user-agent'] || 'Unknown';
 
-    const { sessionId, expiresAt } = await AuthService.createSession(
-      user._id.toString(),
-      ip,
-      userAgent,
-    );
+    const { token } = await createSession(user._id.toString(), ip, userAgent);
 
-    // Ставим куку
-    setSessionCookie(res, sessionId, expiresAt);
-
-    // Возвращаем юзера (без токена в теле ответа, он теперь в httpOnly куке)
-    res.json(user);
+    // Возвращаем токен
+    res.json({
+      user_id: user._id,
+      token,
+    });
   } catch (e) {
     next(e);
   }
 };
 
-export const register = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+export const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const existingUser = await User.findOne({ email: req.body.email });
     if (existingUser) throw new ApiError('Email already exists', 409);
@@ -61,45 +34,35 @@ export const register = async (
     const newUser = new User(req.body);
     await newUser.save();
 
-    // Сразу логиним после регистрации
-    const ip = req.ip || '';
-    const userAgent = req.headers['user-agent'] || '';
-    const { sessionId, expiresAt } = await AuthService.createSession(
-      newUser._id.toString(),
-      ip,
-      userAgent,
-    );
+    // Создаем сессию
+    const ip = req.ip || req.socket.remoteAddress || 'Unknown';
+    const userAgent = req.headers['user-agent'] || 'Unknown';
 
-    setSessionCookie(res, sessionId, expiresAt);
+    const { token } = await createSession(newUser._id.toString(), ip, userAgent);
 
-    res.status(201).json(newUser);
+    // Возвращаем токен
+    res.json({
+      user_id: newUser._id,
+      token,
+    });
   } catch (e) {
     next(e);
   }
 };
 
-export const logout = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+export const logout = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    if (req.session?.id) {
-      await AuthService.deleteSession(req.session.id);
+    if (req.session?.token) {
+      await deleteSession(req.session.token);
     }
 
-    res.clearCookie('sid');
     res.status(200).json({ message: 'Logged out successfully' });
   } catch (e) {
     next(e);
   }
 };
 
-export const registerByPhone = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+export const registerByPhone = async (req: Request, res: Response, next: NextFunction) => {
   try {
     res.json({ message: 'Success' });
   } catch (e) {
@@ -107,11 +70,7 @@ export const registerByPhone = async (
   }
 };
 
-export const validatePasswordStrength = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+export const validatePasswordStrength = async (req: Request, res: Response, next: NextFunction) => {
   try {
     res.json({ message: 'Success' });
   } catch (e) {
@@ -119,11 +78,7 @@ export const validatePasswordStrength = async (
   }
 };
 
-export const forgotPassword = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+export const forgotPassword = async (req: Request, res: Response, next: NextFunction) => {
   try {
     res.json({ message: 'Success' });
   } catch (e) {
@@ -131,11 +86,7 @@ export const forgotPassword = async (
   }
 };
 
-export const resetPassword = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+export const resetPassword = async (req: Request, res: Response, next: NextFunction) => {
   try {
     res.json({ message: 'Success' });
   } catch (e) {
@@ -143,11 +94,7 @@ export const resetPassword = async (
   }
 };
 
-export const revertAccount = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+export const revertAccount = async (req: Request, res: Response, next: NextFunction) => {
   try {
     res.json({ message: 'Success' });
   } catch (e) {

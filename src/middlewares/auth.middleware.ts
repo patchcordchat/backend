@@ -1,39 +1,25 @@
 import { Request, Response, NextFunction } from 'express';
-import { AuthService } from '@/services/auth.service';
+import { getSession, refreshSession } from '@/services/auth.service';
 import { UnauthorizedError } from '@/errors';
 
-const authMiddleware = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    // 1. Получаем sessionId из подписанной куки
-    const sessionId = req.signedCookies['sid'] || req.cookies['sid'];
+    // 1. Получаем токен из заголовка Authorization
+    const token = req.headers.authorization;
 
-    if (!sessionId) {
+    if (!token) {
       throw new UnauthorizedError();
     }
 
     // 2. Ищем сессию через сервис
-    const session = await AuthService.getSession(sessionId);
+    const session = await getSession(token);
 
     if (!session) {
-      // Если кука есть, а сессии нет - чистим куку
-      res.clearCookie('sid');
       throw new UnauthorizedError();
     }
 
-    // 4. Логика продления сессии (Sliding Expiration)
-    const newExpiresAt = await AuthService.refreshSession(session);
-    if (newExpiresAt) {
-      // Обновляем куку, чтобы продлить её жизнь в браузере
-      res.cookie('sid', session.id, {
-        httpOnly: true,
-        signed: true,
-        expires: new Date(newExpiresAt),
-      });
-    }
+    // 3. Продление сессии
+    await refreshSession(session);
 
     req.session = session;
     next();
