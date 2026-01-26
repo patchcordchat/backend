@@ -13,21 +13,15 @@ import {
   getMessageSchema,
   modifyMessageSchema,
 } from '@/schemas/message.schema';
+import { createAttachmentSchema } from '@/schemas/attachment.schema';
 import channelsController from '@/controllers/channels';
 import messagesController from '@/controllers/messages';
+import attachmentsController from '@/controllers/attachments';
 
 const route = express.Router();
 
-route.get(
-  '/:channel_id',
-  validateRequest(getChannelSchema),
-  channelsController.getChannel,
-); // Get Channel
-route.patch(
-  '/:channel_id',
-  validateRequest(modifyChannelSchema),
-  channelsController.modifyChannel,
-); // Modify Channel
+route.get('/:channel_id', validateRequest(getChannelSchema), channelsController.getChannel); // Get Channel
+route.patch('/:channel_id', validateRequest(modifyChannelSchema), channelsController.modifyChannel); // Modify Channel
 route.delete(
   '/:channel_id',
   validateRequest(deleteChannelSchema),
@@ -63,5 +57,10 @@ route.patch(
   validateRequest(modifyMessageSchema),
   messagesController.modifyMessage,
 ); // Modify Message
+route.post(
+  '/:channel_id/attachments',
+  validateRequest(createAttachmentSchema),
+  attachmentsController.createAttachment,
+); // Create Channel Attachment
 
 export default route;

@@ -19,12 +19,12 @@ export const leaveFromServerSchema = {
   params: z.object({
     server_id: z.string(),
   }),
-}
+};
 
 export const createServerSchema = {
   body: z.object({
-    name: z.string().min(2).max(100),
-    description: z.string().max(300).optional(),
+    name: z.string().trim().min(2).max(100),
+    description: z.string().trim().max(300).optional(),
     icon: z.string().optional(),
     afk_timeout: z.number().int().gte(60).lte(3600).optional(),
   }),
@@ -35,8 +35,8 @@ export const modifyServerSchema = {
     server_id: z.string(),
   }),
   body: z.object({
-    name: z.string().min(2).max(100),
-    description: z.string().max(300).optional(),
+    name: z.string().trim().min(2).max(100),
+    description: z.string().trim().max(300).optional(),
     icon: z.string().optional(),
     owner_id: z.string().optional(),
     afk_channel_id: z.string().optional(),
@@ -88,7 +88,7 @@ export const addServerMemberSchema = {
     user_id: z.string(),
   }),
   body: z.object({
-    nick: z.string().optional(),
+    nick: z.string().trim().optional(),
     roles: z.array(z.string()).optional(),
     flags: z.number().int().gte(0).optional(),
   }),

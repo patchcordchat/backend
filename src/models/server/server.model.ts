@@ -10,6 +10,7 @@ const serverSchema = new Schema<IServer>(
     },
     name: {
       type: String,
+      trim: true,
       required: true,
       minLength: 2,
       maxLength: 100,

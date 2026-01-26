@@ -1,12 +1,6 @@
 import { Schema, model, Types } from 'mongoose';
 import { hash, compare } from 'bcryptjs';
-import {
-  IUser,
-  UserModel,
-  IUserMethods,
-  UserFlags,
-  UserPublicFlags,
-} from './user.types';
+import { IUser, UserModel, IUserMethods, UserFlags, UserPublicFlags } from './user.types';
 import { toJSONPlugin } from '../plugins/toJSON.plugin';
 
 const userSchema = new Schema<IUser, UserModel, IUserMethods>(
@@ -19,11 +13,13 @@ const userSchema = new Schema<IUser, UserModel, IUserMethods>(
       type: String,
       required: true,
       unique: true,
+      trim: true,
       minLength: 2,
       maxLength: 32,
     },
     global_name: {
       type: String,
+      trim: true,
       minLength: 1,
       maxLength: 32,
     },
@@ -36,10 +32,12 @@ const userSchema = new Schema<IUser, UserModel, IUserMethods>(
     },
     pronouns: {
       type: String,
+      trim: true,
       maxLength: 40,
     },
     bio: {
       type: String,
+      trim: true,
       default: '',
       maxLength: 190,
     },
@@ -50,11 +48,13 @@ const userSchema = new Schema<IUser, UserModel, IUserMethods>(
     },
     email: {
       type: String,
+      trim: true,
       unique: true,
       sparse: true,
     },
     phone: {
       type: String,
+      trim: true,
       unique: true,
       sparse: true,
     },
@@ -62,6 +62,11 @@ const userSchema = new Schema<IUser, UserModel, IUserMethods>(
       type: Number,
       default: UserFlags.NONE,
       private: true,
+    },
+    date_of_birth: {
+      type: Date,
+      min: '1873-01-01',
+      max: '2022-01-01',
     },
     public_flags: {
       type: Number,
