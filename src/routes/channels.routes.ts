@@ -13,8 +13,10 @@ import {
   getMessageSchema,
   modifyMessageSchema,
 } from '@/schemas/message.schema';
+import { createAttachmentSchema } from '@/schemas/attachment.schema';
 import channelsController from '@/controllers/channels';
 import messagesController from '@/controllers/messages';
+import attachmentsController from '@/controllers/attachments';
 
 const route = express.Router();
 
@@ -55,5 +57,10 @@ route.patch(
   validateRequest(modifyMessageSchema),
   messagesController.modifyMessage,
 ); // Modify Message
+route.post(
+  '/:channel_id/attachments',
+  validateRequest(createAttachmentSchema),
+  attachmentsController.createAttachment,
+); // Create Channel Attachment
 
 export default route;
