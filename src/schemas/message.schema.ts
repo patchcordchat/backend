@@ -1,9 +1,14 @@
 import { z } from 'zod';
+import { Types } from 'mongoose';
 
 export const getMessageSchema = {
   params: z.object({
-    channel_id: z.string(),
-    message_id: z.string(),
+    channel_id: z.string().refine((val) => Types.ObjectId.isValid(val), {
+      message: 'Invalid channel id',
+    }),
+    message_id: z.string().refine((val) => Types.ObjectId.isValid(val), {
+      message: 'Invalid message id',
+    }),
   }),
   body: z.object({
     content: z.string().trim().max(2000).optional(),
@@ -15,7 +20,9 @@ export const getMessageSchema = {
 
 export const createMessageSchema = {
   params: z.object({
-    channel_id: z.string(),
+    channel_id: z.string().refine((val) => Types.ObjectId.isValid(val), {
+      message: 'Invalid channel id',
+    }),
   }),
   body: z.object({
     content: z.string().trim().max(2000).optional(),
@@ -27,7 +34,9 @@ export const createMessageSchema = {
 
 export const getMessagesSchema = {
   params: z.object({
-    channel_id: z.string(),
+    channel_id: z.string().refine((val) => Types.ObjectId.isValid(val), {
+      message: 'Invalid channel id',
+    }),
   }),
   query: z.object({
     around: z.string().optional(),
@@ -39,8 +48,12 @@ export const getMessagesSchema = {
 
 export const modifyMessageSchema = {
   params: z.object({
-    channel_id: z.string(),
-    message_id: z.string(),
+    channel_id: z.string().refine((val) => Types.ObjectId.isValid(val), {
+      message: 'Invalid channel id',
+    }),
+    message_id: z.string().refine((val) => Types.ObjectId.isValid(val), {
+      message: 'Invalid message id',
+    }),
   }),
   body: z.object({
     content: z.string().trim().max(2000).optional(),
@@ -50,7 +63,9 @@ export const modifyMessageSchema = {
 
 export const getDMMessagesSchema = {
   params: z.object({
-    user_id: z.string(),
+    user_id: z.string().refine((val) => Types.ObjectId.isValid(val), {
+      message: 'Invalid user id',
+    }),
   }),
   query: z.object({
     around: z.string().optional(),
@@ -62,7 +77,9 @@ export const getDMMessagesSchema = {
 
 export const createDMMessageSchema = {
   params: z.object({
-    user_id: z.string(),
+    user_id: z.string().refine((val) => Types.ObjectId.isValid(val), {
+      message: 'Invalid user id',
+    }),
   }),
   body: z.object({
     content: z.string().trim().max(2000).optional(),
@@ -74,8 +91,12 @@ export const createDMMessageSchema = {
 
 export const modifyDMMessageSchema = {
   params: z.object({
-    user_id: z.string(),
-    message_id: z.string(),
+    user_id: z.string().refine((val) => Types.ObjectId.isValid(val), {
+      message: 'Invalid user id',
+    }),
+    message_id: z.string().refine((val) => Types.ObjectId.isValid(val), {
+      message: 'Invalid message id',
+    }),
   }),
   body: z.object({
     content: z.string().trim().max(2000).optional(),

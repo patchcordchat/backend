@@ -1,8 +1,11 @@
+import { Types } from 'mongoose';
 import { z } from 'zod';
 
 export const getServerSchema = {
   params: z.object({
-    server_id: z.string(),
+    server_id: z.string().refine((val) => Types.ObjectId.isValid(val), {
+      message: 'Invalid server id',
+    }),
   }),
 };
 
@@ -17,7 +20,9 @@ export const getMyServersSchema = {
 
 export const leaveFromServerSchema = {
   params: z.object({
-    server_id: z.string(),
+    server_id: z.string().refine((val) => Types.ObjectId.isValid(val), {
+      message: 'Invalid server id',
+    }),
   }),
 };
 
@@ -32,7 +37,9 @@ export const createServerSchema = {
 
 export const modifyServerSchema = {
   params: z.object({
-    server_id: z.string(),
+    server_id: z.string().refine((val) => Types.ObjectId.isValid(val), {
+      message: 'Invalid server id',
+    }),
   }),
   body: z.object({
     name: z.string().trim().min(2).max(100),
@@ -45,19 +52,25 @@ export const modifyServerSchema = {
 
 export const deleteServerSchema = {
   params: z.object({
-    server_id: z.string(),
+    server_id: z.string().refine((val) => Types.ObjectId.isValid(val), {
+      message: 'Invalid server id',
+    }),
   }),
 };
 
 export const getServerPreviewSchema = {
   params: z.object({
-    server_id: z.string(),
+    server_id: z.string().refine((val) => Types.ObjectId.isValid(val), {
+      message: 'Invalid server id',
+    }),
   }),
 };
 
 export const getServerMembersSchema = {
   params: z.object({
-    server_id: z.string(),
+    server_id: z.string().refine((val) => Types.ObjectId.isValid(val), {
+      message: 'Invalid server id',
+    }),
   }),
   query: z.object({
     limit: z.coerce.number().int().gte(1).lte(1000).default(1).optional(),
@@ -67,7 +80,9 @@ export const getServerMembersSchema = {
 
 export const searchServerMembersSchema = {
   params: z.object({
-    server_id: z.string(),
+    server_id: z.string().refine((val) => Types.ObjectId.isValid(val), {
+      message: 'Invalid server id',
+    }),
   }),
   body: z.object({
     limit: z.number().int().gte(1).lte(1000).default(25).optional(),
@@ -78,14 +93,20 @@ export const searchServerMembersSchema = {
 
 export const joinServerSchema = {
   params: z.object({
-    server_id: z.string(),
+    server_id: z.string().refine((val) => Types.ObjectId.isValid(val), {
+      message: 'Invalid server id',
+    }),
   }),
 };
 
 export const addServerMemberSchema = {
   params: z.object({
-    server_id: z.string(),
-    user_id: z.string(),
+    server_id: z.string().refine((val) => Types.ObjectId.isValid(val), {
+      message: 'Invalid server id',
+    }),
+    user_id: z.string().refine((val) => Types.ObjectId.isValid(val), {
+      message: 'Invalid user id',
+    }),
   }),
   body: z.object({
     nick: z.string().trim().optional(),
@@ -96,6 +117,8 @@ export const addServerMemberSchema = {
 
 export const getServerRolesSchema = {
   params: z.object({
-    server_id: z.string(),
+    server_id: z.string().refine((val) => Types.ObjectId.isValid(val), {
+      message: 'Invalid server id',
+    }),
   }),
 };
