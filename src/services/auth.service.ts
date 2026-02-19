@@ -2,124 +2,145 @@ import crypto from 'crypto';
 import Session, { type ISession } from '@/models/session';
 import redis from '@/lib/ioredis';
 import { UAParser } from 'ua-parser-js';
+import { generateToken, verifyToken } from './token.service';
 
 const SESSION_TTL = 24 * 60 * 60 * 1000; // 24 часа в миллисекундах
 const REDIS_TTL_SECONDS = 24 * 60 * 60; // То же самое в секундах для Redis
 
-export class AuthService {
-  /**
-   * Создать новую сессию
-   */
-  static async createSession(userId: string, ip: string, userAgent: string) {
-    const parser = new UAParser(userAgent);
+/**
+ * Создать новую сессию и вернуть токен
+ */
+export async function createSession(userId: string, ip: string, userAgent: string) {
+  const parser = new UAParser(userAgent);
 
-    const os = `${parser.getOS().name || 'Unknown'} ${parser.getOS().version || ''}`.trim();
-    const platform = `${parser.getBrowser().name || 'Unknown'} ${parser.getBrowser().version || ''}`.trim();
+  const os = `${parser.getOS().name || 'Unknown'} ${parser.getOS().version || ''}`.trim();
+  const platform =
+    `${parser.getBrowser().name || 'Unknown'} ${parser.getBrowser().version || ''}`.trim();
 
-    const sessionId = crypto.randomBytes(32).toString('hex');
-    const expiresAt = Date.now() + SESSION_TTL;
+  // Генерируем session ID для внутреннего использования
+  const sessionId = crypto.randomBytes(32).toString('hex');
 
-    const sessionData = {
-      id: sessionId,
-      user_id: userId,
-      client_info: {
-        os,
-        platform,
-        ip,
-      },
-      user_agent: userAgent,
-      expires_at: expiresAt,
-      last_active: Date.now(),
-    };
+  // Генерируем токен в стиле Discord
+  const token = generateToken(userId);
 
-    // 1. Сохраняем в MongoDB
-    const session = await Session.create(sessionData);
+  const expiresAt = Date.now() + SESSION_TTL;
 
-    // 2. Сохраняем в Redis
-    await redis.set(
-      `session:${sessionId}`,
-      JSON.stringify(session),
-      'EX',
-      REDIS_TTL_SECONDS,
-    );
+  const sessionData = {
+    id: sessionId,
+    user_id: userId,
+    token, // Сохраняем токен в сессии
+    client_info: {
+      os,
+      platform,
+      ip,
+    },
+    user_agent: userAgent,
+    expires_at: expiresAt,
+    last_active: Date.now(),
+  };
 
-    return { sessionId, expiresAt };
-  }
+  // 1. Сохраняем в MongoDB
+  const session = await Session.create(sessionData);
 
-  /**
-   * Получить сессию
-   */
-  static async getSession(sessionId: string): Promise<ISession | null> {
-    const redisKey = `session:${sessionId}`;
+  // 2. Сохраняем в Redis по токену
+  await redis.set(`token:${token}`, JSON.stringify(session), 'EX', REDIS_TTL_SECONDS);
 
-    // 1. Пытаемся найти в Redis
-    const cachedSession = await redis.get(redisKey);
-    if (cachedSession) {
-      const session = JSON.parse(cachedSession) as ISession;
-      return session;
-    }
+  return { token, expiresAt };
+}
 
-    // 2. Если нет в Redis, ищем в MongoDB
-    const session = await Session.findOne({ sessionId });
-
-    if (session) {
-      // Проверяем, не истекла ли она
-      if (session.expires_at < Date.now()) {
-        await Session.deleteOne({ sessionId });
-        return null;
-      }
-
-      // 3. Если нашли в базе - кладем в Redis
-      // Вычисляем оставшееся время жизни для Redis
-      const ttl = Math.ceil((session.expires_at - Date.now()) / 1000);
-      if (ttl > 0) {
-        await redis.set(redisKey, JSON.stringify(session), 'EX', ttl);
-      }
-      return session;
-    }
-
+/**
+ * Получить сессию по токену
+ */
+export async function getSession(token: string): Promise<ISession | null> {
+  // Проверяем валидность токена
+  const verified = verifyToken(token);
+  if (!verified) {
     return null;
   }
 
-  /**
-   * Продлить сессию
-   */
-  static async refreshSession(session: ISession) {
-    const now = Date.now();
-    // Продлеваем, только если прошёл 1 час с последнего обновления
-    const ONE_HOUR = 60 * 60 * 1000;
+  const redisKey = `token:${token}`;
 
-    if (session.expires_at - now < SESSION_TTL - ONE_HOUR) {
-      const newExpiresAt = now + SESSION_TTL;
+  // 1. Пытаемся найти в Redis
+  const cachedSession = await redis.get(redisKey);
+  if (cachedSession) {
+    const session = JSON.parse(cachedSession) as ISession;
 
-      // Обновляем в Mongo
-      await Session.updateOne(
-        { id: session.id },
-        { expires_at: newExpiresAt, last_active: new Date() },
-      );
-
-      // Обновляем объект в памяти для Redis
-      session.expires_at = newExpiresAt;
-      session.last_active = Date.now();
-
-      // Обновляем в Redis
-      await redis.set(
-        `session:${session.id}`,
-        JSON.stringify(session),
-        'EX',
-        REDIS_TTL_SECONDS,
-      );
-
-      return newExpiresAt; // Возвращаем новую дату для обновления куки
+    // Проверяем срок действия
+    if (session.expires_at < Date.now()) {
+      await deleteSession(token);
+      return null;
     }
-    return null; // Обновление не требуется
+
+    return session;
   }
 
-  /**
-   * Удалить сессию
-   */
-  static async deleteSession(sessionId: string) {
-    await redis.del(`session:${sessionId}`);
-    await Session.deleteOne({ sessionId });
+  // 2. Если нет в Redis, ищем в MongoDB
+  const session = await Session.findOne({ token });
+
+  if (session) {
+    // Проверяем, не истекла ли она
+    if (session.expires_at < Date.now()) {
+      await deleteSession(token);
+      return null;
+    }
+
+    // 3. Если нашли в базе - кладем в Redis
+    const ttl = Math.ceil((session.expires_at - Date.now()) / 1000);
+    if (ttl > 0) {
+      await redis.set(redisKey, JSON.stringify(session), 'EX', ttl);
+    }
+    return session;
   }
+
+  return null;
+}
+
+/**
+ * Продлить сессию
+ */
+export async function refreshSession(session: ISession) {
+  const now = Date.now();
+  const ONE_HOUR = 60 * 60 * 1000;
+
+  if (session.expires_at - now < SESSION_TTL - ONE_HOUR) {
+    const newExpiresAt = now + SESSION_TTL;
+
+    // Обновляем в Mongo
+    await Session.updateOne({ id: session.id }, { expires_at: newExpiresAt, last_active: now });
+
+    // Обновляем объект в памяти
+    session.expires_at = newExpiresAt;
+    session.last_active = now;
+
+    // Обновляем в Redis
+    await redis.set(`token:${session.token}`, JSON.stringify(session), 'EX', REDIS_TTL_SECONDS);
+
+    return newExpiresAt;
+  }
+  return null;
+}
+
+/**
+ * Удалить сессию по токену
+ */
+export async function deleteSession(token: string) {
+  await redis.del(`token:${token}`);
+  await Session.deleteOne({ token });
+}
+
+/**
+ * Удалить все сессии пользователя (например, при смене пароля)
+ */
+export async function deleteAllUserSessions(userId: string) {
+  const sessions = await Session.find({ user_id: userId });
+
+  // Удаляем все токены из Redis
+  const pipeline = redis.pipeline();
+  sessions.forEach((session) => {
+    pipeline.del(`token:${session.token}`);
+  });
+  await pipeline.exec();
+
+  // Удаляем все сессии из MongoDB
+  await Session.deleteMany({ user_id: userId });
 }

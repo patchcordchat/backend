@@ -1,10 +1,6 @@
 import { Server as SocketIOServer } from 'socket.io';
 import { type Server } from 'http';
-import { AuthService } from '@/services/auth.service';
-import { parse } from 'cookie';
-import { unsign } from 'cookie-signature';
-import config from '@/config';
-
+import { getSession } from '@/services/auth.service';
 import { registerChatHandlers } from '@/controllers/chat/chat.socket';
 import { registerWebRtcHandlers } from '@/controllers/webrtc/webrtc.socket';
 import { registerPresenceHandlers } from '@/controllers/presence/presence.socket';
@@ -24,26 +20,13 @@ export function initSocket(server: Server): void {
   // Middleware авторизации
   io.use(async (socket, next) => {
     const req = socket.request;
-    if (!req.headers.cookie) {
+    if (!req.headers.authorization) {
       return next(new Error('Unauthorized'));
     }
 
-    const cookies = parse(req.headers.cookie);
-    const rawSid = cookies['sid'];
-    if (!rawSid) {
-      return next(new Error('Unauthorized'));
-    }
+    const token = req.headers.authorization;
 
-    let sessionId = rawSid;
-    if (rawSid.startsWith('s:')) {
-      const unsigned = unsign(rawSid.slice(2), config.app.secretKey);
-      if (unsigned === false) {
-        return next(new Error('Unauthorized'));
-      }
-      sessionId = unsigned;
-    }
-
-    const session = await AuthService.getSession(sessionId);
+    const session = await getSession(token);
     if (!session) {
       return next(new Error('Unauthorized'));
     }
@@ -53,7 +36,7 @@ export function initSocket(server: Server): void {
   });
 
   io.on('connection', async (socket) => {
-    const userId = socket.data.userId!;
+    const userId = socket.data.userId;
 
     socket.join(`user:${userId}`);
 
