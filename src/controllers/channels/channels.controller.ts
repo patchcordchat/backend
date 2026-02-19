@@ -4,11 +4,7 @@ import Channel, { ChannelTypes } from '@/models/channel';
 import { getIO } from '@/socket';
 import { NotFoundError, ApiError } from '@/errors';
 
-export const getServerChannels = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+export const getServerChannels = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const serverId = req.params?.server_id;
 
@@ -17,9 +13,7 @@ export const getServerChannels = async (
       throw new NotFoundError('Server not found');
     }
 
-    const channels = await Channel.find({ server_id: serverId })
-      .sort({ position: 1 })
-      .lean();
+    const channels = await Channel.find({ server_id: serverId }).sort({ position: 1 });
 
     res.json(channels);
   } catch (error) {
@@ -27,11 +21,7 @@ export const getServerChannels = async (
   }
 };
 
-export const createServerChannel = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+export const createServerChannel = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const serverId = req.params?.server_id;
     const userId = req.session?.user_id;
@@ -57,11 +47,7 @@ export const createServerChannel = async (
   }
 };
 
-export const modifyChannelPosition = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+export const modifyChannelPosition = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const serverId = req.params?.server_id;
     const channelId = req.params?.channel_id;
@@ -88,11 +74,7 @@ export const modifyChannelPosition = async (
   }
 };
 
-export const getChannel = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+export const getChannel = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { channel_id } = req.params;
     const channel = await Channel.findById(channel_id);
@@ -105,11 +87,7 @@ export const getChannel = async (
   }
 };
 
-export const modifyChannel = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+export const modifyChannel = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const channelId = req.params?.channel_id;
 
@@ -125,11 +103,7 @@ export const modifyChannel = async (
   }
 };
 
-export const deleteChannel = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+export const deleteChannel = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const channelId = req.params?.channel_id;
 
@@ -144,11 +118,7 @@ export const deleteChannel = async (
   }
 };
 
-export const getPrivateChannels = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+export const getPrivateChannels = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userId = req.session?.user_id;
 
@@ -163,11 +133,7 @@ export const getPrivateChannels = async (
   }
 };
 
-export const createPrivateChannel = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+export const createPrivateChannel = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userId = req.session?.user_id;
 
@@ -186,11 +152,7 @@ export const createPrivateChannel = async (
   }
 };
 
-export const getDMChannel = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+export const getDMChannel = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userId = req.session?.user_id;
     const recipientId = req.params?.user_id;
@@ -206,11 +168,7 @@ export const getDMChannel = async (
   }
 };
 
-export const triggerTyping = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+export const triggerTyping = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const channelId = req.params?.channel_id;
 
@@ -223,11 +181,7 @@ export const triggerTyping = async (
   }
 };
 
-export const getCallEligibility = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+export const getCallEligibility = async (req: Request, res: Response, next: NextFunction) => {
   try {
     res.json({ message: 'Success' });
   } catch (error) {
