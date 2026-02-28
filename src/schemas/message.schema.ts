@@ -65,7 +65,7 @@ export const getMessagesSchema = {
         message: 'Invalid message id',
       })
       .optional(),
-    limit: z.coerce.number().int().gte(1).lte(100).default(50),
+    limit: z.number().int().gte(1).lte(100).default(50),
   }),
 };
 

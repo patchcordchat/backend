@@ -1,4 +1,18 @@
-import { Request, Response, NextFunction } from 'express';
+import { Response, NextFunction } from 'express';
+import {
+  getServerSchema,
+  createServerSchema,
+  modifyServerSchema,
+  deleteServerSchema,
+  getServerPreviewSchema,
+  getServerMembersSchema,
+  searchServerMembersSchema,
+  joinServerSchema,
+  addServerMemberSchema,
+  getServerRolesSchema,
+  getMyServersSchema,
+  leaveFromServerSchema,
+} from '@/schemas/server.schema';
 import { ApiError, BadRequestError, NotFoundError } from '@/errors';
 import { StoragePaths } from '@/utils/storage.utils';
 import { processBase64Image, generateFileHash } from '@/utils/image.utils';
@@ -8,7 +22,11 @@ import User from '@/models/user';
 import Server from '@/models/server';
 import ServerMember from '@/models/server-member';
 
-export const getServer = async (req: Request, res: Response, next: NextFunction) => {
+export const getServer = async (
+  req: ValidatedRequest<typeof getServerSchema.params>,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const serverId = req.params?.server_id;
     if (!serverId) {
@@ -26,7 +44,11 @@ export const getServer = async (req: Request, res: Response, next: NextFunction)
   }
 };
 
-export const createServer = async (req: Request, res: Response, next: NextFunction) => {
+export const createServer = async (
+  req: ValidatedRequest<undefined, undefined, typeof createServerSchema.body>,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const newServer = new Server({
       ...req.body,
@@ -70,7 +92,15 @@ export const createServer = async (req: Request, res: Response, next: NextFuncti
   }
 };
 
-export const modifyServer = async (req: Request, res: Response, next: NextFunction) => {
+export const modifyServer = async (
+  req: ValidatedRequest<
+    typeof modifyServerSchema.params,
+    undefined,
+    typeof modifyServerSchema.body
+  >,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const serverId = req.params?.server_id;
     if (!serverId) {
@@ -103,7 +133,11 @@ export const modifyServer = async (req: Request, res: Response, next: NextFuncti
   }
 };
 
-export const deleteServer = async (req: Request, res: Response, next: NextFunction) => {
+export const deleteServer = async (
+  req: ValidatedRequest<typeof deleteServerSchema.params>,
+  res: Response,
+  next: NextFunction,
+) => {
   const serverId = req.params?.server_id;
 
   try {
@@ -121,7 +155,11 @@ export const deleteServer = async (req: Request, res: Response, next: NextFuncti
   }
 };
 
-export const getServerPreview = async (req: Request, res: Response, next: NextFunction) => {
+export const getServerPreview = async (
+  req: ValidatedRequest<typeof getServerPreviewSchema.params>,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const serverId = req.params?.server_id;
 
@@ -148,7 +186,11 @@ export const getServerPreview = async (req: Request, res: Response, next: NextFu
   }
 };
 
-export const getServerMembers = async (req: Request, res: Response, next: NextFunction) => {
+export const getServerMembers = async (
+  req: ValidatedRequest<typeof getServerMembersSchema.params>,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const serverId = req.params?.server_id;
 
@@ -168,10 +210,18 @@ export const getServerMembers = async (req: Request, res: Response, next: NextFu
   }
 };
 
-export const searchServerMembers = async (req: Request, res: Response, next: NextFunction) => {
+export const searchServerMembers = async (
+  req: ValidatedRequest<
+    typeof searchServerMembersSchema.params,
+    unknown,
+    typeof searchServerMembersSchema.body
+  >,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
-    const serverId = req.params?.server_id;
-    const query = req.query?.query as string;
+    const serverId = req.params.server_id;
+    const query = req.body.query;
 
     if (!query || query.length < 2) {
       return res.json([]);
@@ -196,7 +246,11 @@ export const searchServerMembers = async (req: Request, res: Response, next: Nex
   }
 };
 
-export const joinServer = async (req: Request, res: Response, next: NextFunction) => {
+export const joinServer = async (
+  req: ValidatedRequest<typeof joinServerSchema.params>,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const serverId = req.params?.server_id;
     const userId = req.session?.user_id;
@@ -227,10 +281,14 @@ export const joinServer = async (req: Request, res: Response, next: NextFunction
   }
 };
 
-export const addServerMember = async (req: Request, res: Response, next: NextFunction) => {
+export const addServerMember = async (
+  req: ValidatedRequest<typeof addServerMemberSchema.params>,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
-    const serverId = req.params?.server_id;
-    const userIdToAdd = req.params?.user_id;
+    const serverId = req.params.server_id;
+    const userIdToAdd = req.params.user_id;
 
     const server = await Server.findById(serverId);
     if (!server) {
@@ -263,9 +321,13 @@ export const addServerMember = async (req: Request, res: Response, next: NextFun
   }
 };
 
-export const getServerRoles = async (req: Request, res: Response, next: NextFunction) => {
+export const getServerRoles = async (
+  req: ValidatedRequest<typeof getServerRolesSchema.params>,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
-    const serverId = req.params?.server_id;
+    const serverId = req.params.server_id;
 
     const serverExists = await Server.exists({ _id: serverId });
     if (!serverExists) {
@@ -280,7 +342,11 @@ export const getServerRoles = async (req: Request, res: Response, next: NextFunc
   }
 };
 
-export const getMyServers = async (req: Request, res: Response, next: NextFunction) => {
+export const getMyServers = async (
+  req: ValidatedRequest<unknown, unknown, typeof getMyServersSchema.query>,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const userId = req.session?.user_id;
 
@@ -294,7 +360,11 @@ export const getMyServers = async (req: Request, res: Response, next: NextFuncti
     next(error);
   }
 };
-export const leaveFromServer = async (req: Request, res: Response, next: NextFunction) => {
+export const leaveFromServer = async (
+  req: ValidatedRequest<typeof leaveFromServerSchema.params>,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const serverId = req.params?.server_id;
     const userId = req.session?.user_id;

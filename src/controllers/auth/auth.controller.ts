@@ -1,9 +1,14 @@
 import { Request, Response, NextFunction } from 'express';
+import { loginSchema, registerSchema } from '@/schemas/auth.schema';
 import { createSession, deleteSession } from '@/services/auth.service';
 import { UnauthorizedError, ApiError } from '@/errors';
 import User from '@/models/user';
 
-export const login = async (req: Request, res: Response, next: NextFunction) => {
+export const login = async (
+  req: ValidatedRequest<unknown, unknown, typeof loginSchema.body>,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const { email, password } = req.body;
 
@@ -26,7 +31,11 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
   }
 };
 
-export const register = async (req: Request, res: Response, next: NextFunction) => {
+export const register = async (
+  req: ValidatedRequest<unknown, unknown, typeof registerSchema.body>,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const existingUser = await User.findOne({ email: req.body.email });
     if (existingUser) throw new ApiError('Email already exists', 409);

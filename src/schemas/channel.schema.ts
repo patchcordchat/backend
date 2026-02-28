@@ -75,6 +75,11 @@ export const getServerChannelsSchema = {
 };
 
 export const createServerChannelSchema = {
+  params: z.object({
+    server_id: z.string().refine((val) => Types.ObjectId.isValid(val), {
+      message: 'Invalid server id',
+    }),
+  }),
   body: z.object({
     name: z.string().trim().min(1).max(100),
     type: z.number().int().gte(0).lte(3),
@@ -84,6 +89,11 @@ export const createServerChannelSchema = {
 };
 
 export const modifyChannelPositionSchema = {
+  params: z.object({
+    server_id: z.string().refine((val) => Types.ObjectId.isValid(val), {
+      message: 'Invalid server id',
+    }),
+  }),
   body: z.object({
     id: z.string(),
     position: z.number().int().optional(),

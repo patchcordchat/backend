@@ -88,6 +88,7 @@ export const searchServerMembersSchema = {
     limit: z.number().int().gte(1).lte(1000).default(25).optional(),
     after: z.string().optional(),
     sort: z.number().int(),
+    query: z.string().optional(),
   }),
 };
 
