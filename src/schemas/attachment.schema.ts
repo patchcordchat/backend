@@ -1,8 +1,11 @@
 import { z } from 'zod';
+import { Types } from 'mongoose';
 
 export const createAttachmentSchema = {
   params: z.object({
-    channel_id: z.string(),
+    channel_id: z.string().refine((val) => Types.ObjectId.isValid(val), {
+      message: 'Invalid channel id',
+    }),
   }),
   body: z.object({
     files: z.array(
@@ -18,7 +21,11 @@ export const createAttachmentSchema = {
 
 export const deleteAttachmentSchema = {
   params: z.object({
-    channel_id: z.string(),
-    attachment_id: z.string(),
+    channel_id: z.string().refine((val) => Types.ObjectId.isValid(val), {
+      message: 'Invalid channel id',
+    }),
+    attachment_id: z.string().refine((val) => Types.ObjectId.isValid(val), {
+      message: 'Invalid attachment id',
+    }),
   }),
 };

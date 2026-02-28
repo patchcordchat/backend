@@ -1,14 +1,19 @@
 import { z } from 'zod';
+import { Types } from 'mongoose';
 
 export const getChannelSchema = {
   params: z.object({
-    channel_id: z.string(),
+    channel_id: z.string().refine((val) => Types.ObjectId.isValid(val), {
+      message: 'Invalid channel id',
+    }),
   }),
 };
 
 export const modifyChannelSchema = {
   params: z.object({
-    channel_id: z.string(),
+    channel_id: z.string().refine((val) => Types.ObjectId.isValid(val), {
+      message: 'Invalid channel id',
+    }),
   }),
   body: z.object({
     name: z.string().trim().min(1).max(100),
@@ -21,19 +26,25 @@ export const modifyChannelSchema = {
 
 export const deleteChannelSchema = {
   params: z.object({
-    channel_id: z.string(),
+    channel_id: z.string().refine((val) => Types.ObjectId.isValid(val), {
+      message: 'Invalid channel id',
+    }),
   }),
 };
 
 export const triggerTypingSchema = {
   params: z.object({
-    channel_id: z.string(),
+    channel_id: z.string().refine((val) => Types.ObjectId.isValid(val), {
+      message: 'Invalid channel id',
+    }),
   }),
 };
 
 export const getCallEligibilitySchema = {
   params: z.object({
-    channel_id: z.string(),
+    channel_id: z.string().refine((val) => Types.ObjectId.isValid(val), {
+      message: 'Invalid channel id',
+    }),
   }),
 };
 
@@ -49,13 +60,17 @@ export const createPrivateChannelSchema = {
 
 export const getDMChannelSchema = {
   params: z.object({
-    user_id: z.string(),
+    user_id: z.string().refine((val) => Types.ObjectId.isValid(val), {
+      message: 'Invalid user id',
+    }),
   }),
 };
 
 export const getServerChannelsSchema = {
   params: z.object({
-    server_id: z.string(),
+    server_id: z.string().refine((val) => Types.ObjectId.isValid(val), {
+      message: 'Invalid server id',
+    }),
   }),
 };
 
