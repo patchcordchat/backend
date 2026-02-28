@@ -29,6 +29,14 @@ export const createMessageSchema = {
     tts: z.boolean().optional(),
     type: z.number().int().gte(0).lte(9).optional(),
     flags: z.number().int().optional(),
+    attachments: z.array(
+      z.object({
+        id: z.string().refine((val) => Types.ObjectId.isValid(val), {
+          message: 'Invalid attachment id',
+        }),
+        filename: z.string(),
+      }),
+    ),
   }),
 };
 
@@ -39,9 +47,24 @@ export const getMessagesSchema = {
     }),
   }),
   query: z.object({
-    around: z.string().optional(),
-    before: z.string().optional(),
-    after: z.string().optional(),
+    around: z
+      .string()
+      .refine((val) => Types.ObjectId.isValid(val), {
+        message: 'Invalid message id',
+      })
+      .optional(),
+    before: z
+      .string()
+      .refine((val) => Types.ObjectId.isValid(val), {
+        message: 'Invalid message id',
+      })
+      .optional(),
+    after: z
+      .string()
+      .refine((val) => Types.ObjectId.isValid(val), {
+        message: 'Invalid message id',
+      })
+      .optional(),
     limit: z.coerce.number().int().gte(1).lte(100).default(50),
   }),
 };
@@ -58,6 +81,14 @@ export const modifyMessageSchema = {
   body: z.object({
     content: z.string().trim().max(2000).optional(),
     flags: z.number().int().optional(),
+    attachments: z.array(
+      z.object({
+        id: z.string().refine((val) => Types.ObjectId.isValid(val), {
+          message: 'Invalid attachment id',
+        }),
+        filename: z.string(),
+      }),
+    ),
   }),
 };
 
