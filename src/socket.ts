@@ -2,7 +2,7 @@ import { Server as SocketIOServer } from 'socket.io';
 import { type Server } from 'http';
 import { getSession } from '@/services/auth.service';
 import { registerChatHandlers } from '@/controllers/chat/chat.socket';
-import { registerWebRtcHandlers } from '@/controllers/webrtc/webrtc.socket';
+import { registerCallHandlers } from '@/controllers/call/call.socket';
 import { registerPresenceHandlers } from '@/controllers/presence/presence.socket';
 import { setUserStatus } from '@/services/presence.service';
 import { UserStatus } from '@/models/user-settings';
@@ -48,8 +48,8 @@ export function initSocket(server: Server): void {
     // Подключение хендлеров чата
     registerChatHandlers(socket);
 
-    // Подключение WebRTC хендлеров
-    registerWebRtcHandlers(socket);
+    // Подключение хендлеров звонков
+    registerCallHandlers(socket);
 
     // Подключение хендлеров присутствия
     registerPresenceHandlers(io, socket);

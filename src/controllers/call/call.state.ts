@@ -1,9 +1,4 @@
-import {
-  Router,
-  Transport,
-  Producer,
-  Consumer,
-} from 'mediasoup/node/lib/types';
+import { Router, Transport, Producer, Consumer } from 'mediasoup/node/lib/types';
 
 export interface Peer {
   socketId: string;
@@ -41,10 +36,7 @@ export const removeRoom = (channelId: string) => {
   }
 };
 
-export const getPeerByUserId = (
-  roomId: string,
-  userId: string,
-): Peer | undefined => {
+export const getPeerByUserId = (roomId: string, userId: string): Peer | undefined => {
   const room = rooms.get(roomId);
   if (!room) return undefined;
   for (const peer of room.peers.values()) {
@@ -57,11 +49,7 @@ export const getPeer = (channelId: string, socketId: string) => {
   return rooms.get(channelId)?.peers.get(socketId);
 };
 
-export const createPeer = (
-  roomId: string,
-  socketId: string,
-  userId: string,
-) => {
+export const createPeer = (roomId: string, socketId: string, userId: string) => {
   const room = rooms.get(roomId);
   if (!room) return null;
 
