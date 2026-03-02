@@ -44,7 +44,7 @@ export const registerCallHandlers = (socket: Socket) => {
    * 1. JOIN: Вход в голосовой канал
    * Клиент отправляет channelId, сервер создает/ищет Router и возвращает RTP Capabilities
    */
-  socket.on('voice:join', async (data: { channel_id: string; user_id: string }, callback) => {
+  socket.on('call:join', async (data: { channel_id: string; user_id: string }, callback) => {
     try {
       const { channel_id, user_id } = data;
       currentVoiceChannelId = channel_id;
@@ -64,20 +64,20 @@ export const registerCallHandlers = (socket: Socket) => {
         // Оповещаем старый сокет, что он отключен
         socket
           .to(existingPeer.socketId)
-          .emit('voice:kicked', { reason: 'Logged in from another device' });
+          .emit('call:kicked', { reason: 'Logged in from another device' });
 
         // Удаляем старого пира из стейта и Mediasoup
         state.removePeer(channel_id, existingPeer.socketId);
 
         // Оповещаем комнату, что старый ID отключился (чтобы убрали видео/аудио)
-        socket.to(`voice:${channel_id}`).emit('voice:user_left', { userId: user_id });
+        socket.to(`channel:${channel_id}`).emit('call:user_left', { userId: user_id });
       }
 
       // 3. Создаем нового Peer
       state.createPeer(channel_id, socket.id, user_id);
 
       // Джойнимся в комнату socket.io
-      socket.join(`voice:${channel_id}`);
+      socket.join(`channel:${channel_id}`);
 
       // 4. Собираем данные для ответа (User ID + Producers)
       // Клиент должен получить список ВСЕХ текущих участников и их стримов
@@ -102,7 +102,7 @@ export const registerCallHandlers = (socket: Socket) => {
       });
 
       // 5. Оповещаем остальных, что зашел новый юзер (без стримов пока)
-      socket.to(`voice:${channel_id}`).emit('voice:user_joined', { user_id });
+      socket.to(`channel:${channel_id}`).emit('call:user_joined', { user_id });
 
       callback({
         rtpCapabilities: room.router.rtpCapabilities,
@@ -117,7 +117,7 @@ export const registerCallHandlers = (socket: Socket) => {
   /**
    * 2. CREATE TRANSPORT: Создание WebRTC транспорта (sending или receiving)
    */
-  socket.on('voice:media:create_transport', async (data, callback) => {
+  socket.on('call:media:create_transport', async (data, callback) => {
     try {
       if (!currentVoiceChannelId) throw new Error('Not joined a channel');
       const room = state.getRoom(currentVoiceChannelId);
@@ -141,7 +141,7 @@ export const registerCallHandlers = (socket: Socket) => {
    * 3. CONNECT TRANSPORT: DTLS рукопожатие
    */
   socket.on(
-    'voice:media:connect_transport',
+    'call:media:connect_transport',
     async (data: { transport_id: string; dtls_parameters: any }, callback) => {
       try {
         if (!currentVoiceChannelId) return;
@@ -162,7 +162,7 @@ export const registerCallHandlers = (socket: Socket) => {
   /**
    * 4. PRODUCE: Публикация медиа (аудио/видео)
    */
-  socket.on('voice:media:produce', async (data, callback) => {
+  socket.on('call:media:produce', async (data, callback) => {
     try {
       if (!currentVoiceChannelId) throw new Error('Not joined');
       const room = state.getRoom(currentVoiceChannelId);
@@ -180,7 +180,7 @@ export const registerCallHandlers = (socket: Socket) => {
       peer?.producers.set(producer.id, producer);
 
       // Оповещаем других с userId
-      socket.to(`voice:${currentVoiceChannelId}`).emit('voice:media:producer_added', {
+      socket.to(`channel:${currentVoiceChannelId}`).emit('call:media:producer_added', {
         producerId: producer.id,
         userId: currentUserId,
         kind: producer.kind,
@@ -198,10 +198,10 @@ export const registerCallHandlers = (socket: Socket) => {
     }
   });
 
-  socket.on('voice:speaking', (data) => {
+  socket.on('call:speaking', (data) => {
     const { user_id, speaking } = data;
     // Отправляем всем в канале, кроме отправителя
-    socket.to(`voice:${currentVoiceChannelId}`).emit('voice:user_speaking', {
+    socket.to(`channel:${currentVoiceChannelId}`).emit('call:user_speaking', {
       user_id,
       speaking,
     });
@@ -211,7 +211,7 @@ export const registerCallHandlers = (socket: Socket) => {
    * 5. CONSUME: Подписка на чужой стрим
    */
   socket.on(
-    'voice:media:consume',
+    'call:media:consume',
     async (
       data: { transport_id: string; producer_id: string; rtp_capabilities: any },
       callback,
@@ -249,7 +249,7 @@ export const registerCallHandlers = (socket: Socket) => {
 
         // Обработка закрытия продюсера (если тот, кого мы слушаем, отключился)
         consumer.on('producerclose', () => {
-          socket.emit('voice:media:consumer_closed', { consumer_id: consumer.id });
+          socket.emit('call:media:consumer_closed', { consumer_id: consumer.id });
           consumer.close();
           peer?.consumers.delete(consumer.id);
         });
@@ -270,7 +270,7 @@ export const registerCallHandlers = (socket: Socket) => {
   /**
    * 6. RESUME: Запуск потока после consume
    */
-  socket.on('voice:media:resume', async (data: { consumer_id: string }) => {
+  socket.on('call:media:resume', async (data: { consumer_id: string }) => {
     try {
       if (!currentVoiceChannelId) return;
       const peer = state.getPeer(currentVoiceChannelId, socket.id);
@@ -284,11 +284,14 @@ export const registerCallHandlers = (socket: Socket) => {
     }
   });
 
-  socket.on('disconnect', () => {
+  const onDisconnect = () => {
     if (!currentVoiceChannelId || !currentUserId) return;
 
     state.removePeer(currentVoiceChannelId, socket.id);
     // Оповещаем, что ушел именно этот userId
-    socket.to(`voice:${currentVoiceChannelId}`).emit('voice:peer_left', { userId: currentUserId });
-  });
+    socket.to(`channel:${currentVoiceChannelId}`).emit('call:peer_left', { userId: currentUserId });
+  };
+
+  socket.on('disconnect', onDisconnect);
+  socket.on('call:leave', onDisconnect);
 };
