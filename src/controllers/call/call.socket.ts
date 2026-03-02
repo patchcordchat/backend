@@ -70,7 +70,7 @@ export const registerCallHandlers = (socket: Socket) => {
         state.removePeer(channel_id, existingPeer.socketId);
 
         // Оповещаем комнату, что старый ID отключился (чтобы убрали видео/аудио)
-        socket.to(`channel:${channel_id}`).emit('call:user_left', { userId: user_id });
+        socket.to(`channel:${channel_id}`).emit('call:user_left', { user_id });
       }
 
       // 3. Создаем нового Peer
@@ -181,8 +181,8 @@ export const registerCallHandlers = (socket: Socket) => {
 
       // Оповещаем других с userId
       socket.to(`channel:${currentVoiceChannelId}`).emit('call:media:producer_added', {
-        producerId: producer.id,
-        userId: currentUserId,
+        producer_id: producer.id,
+        user_id: currentUserId,
         kind: producer.kind,
       });
 
@@ -289,7 +289,9 @@ export const registerCallHandlers = (socket: Socket) => {
 
     state.removePeer(currentVoiceChannelId, socket.id);
     // Оповещаем, что ушел именно этот userId
-    socket.to(`channel:${currentVoiceChannelId}`).emit('call:peer_left', { userId: currentUserId });
+    socket
+      .to(`channel:${currentVoiceChannelId}`)
+      .emit('call:user_left', { user_id: currentUserId });
   };
 
   socket.on('disconnect', onDisconnect);
