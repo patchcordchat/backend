@@ -73,7 +73,7 @@ export const logout = async (req: Request, res: Response, next: NextFunction) =>
 
 export const registerByPhone = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    res.json({ message: 'Success' });
+    res.status(405).send();
   } catch (e) {
     next(e);
   }
@@ -81,7 +81,7 @@ export const registerByPhone = async (req: Request, res: Response, next: NextFun
 
 export const validatePasswordStrength = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    res.json({ message: 'Success' });
+    res.status(405).send();
   } catch (e) {
     next(e);
   }
@@ -89,7 +89,7 @@ export const validatePasswordStrength = async (req: Request, res: Response, next
 
 export const forgotPassword = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    res.json({ message: 'Success' });
+    res.status(405).send();
   } catch (e) {
     next(e);
   }
@@ -97,7 +97,7 @@ export const forgotPassword = async (req: Request, res: Response, next: NextFunc
 
 export const resetPassword = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    res.json({ message: 'Success' });
+    res.status(405).send();
   } catch (e) {
     next(e);
   }
@@ -105,7 +105,7 @@ export const resetPassword = async (req: Request, res: Response, next: NextFunct
 
 export const revertAccount = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    res.json({ message: 'Success' });
+    res.status(405).send();
   } catch (e) {
     next(e);
   }

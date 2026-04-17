@@ -17,6 +17,7 @@ export interface IRelationship {
   target_id: Types.ObjectId;
   type: number;
   nickname: string;
+  user_ignored: boolean;
   created_at: number;
   updated_at: number;
 }

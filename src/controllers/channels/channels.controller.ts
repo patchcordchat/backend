@@ -160,7 +160,7 @@ export const deleteChannel = async (
 
     await channel.deleteOne();
 
-    res.json({ message: 'Success' });
+    res.status(204).send();
   } catch (error) {
     next(error);
   }
@@ -239,7 +239,7 @@ export const triggerTyping = async (
     const io = getIO();
     io.to(`channel:${channelId}`).emit('typing:start', channelId);
 
-    res.json({ message: 'Success' });
+    res.status(204).send();
   } catch (error) {
     next(error);
   }
@@ -251,7 +251,7 @@ export const getCallEligibility = async (
   next: NextFunction,
 ) => {
   try {
-    res.json({ message: 'Success' });
+    res.status(405).send();
   } catch (error) {
     next(error);
   }

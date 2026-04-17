@@ -31,6 +31,10 @@ const relationshipSchema = new Schema<IRelationship>(
       maxlength: 32,
       default: null,
     },
+    user_ignored: {
+      type: Boolean,
+      default: false,
+    },
     created_at: {
       type: Number,
       required: true,

@@ -58,7 +58,7 @@ export const updateMe = async (req: Request, res: Response, next: NextFunction) 
 
 export const updateMyAccount = (req: Request, res: Response, next: NextFunction) => {
   try {
-    res.json({ message: 'Success' });
+    res.status(405).send();
   } catch (error) {
     next(error);
   }
@@ -66,7 +66,7 @@ export const updateMyAccount = (req: Request, res: Response, next: NextFunction)
 
 export const updateMyProfile = (req: Request, res: Response, next: NextFunction) => {
   try {
-    res.json({ message: 'Success' });
+    res.status(405).send();
   } catch (error) {
     next(error);
   }
@@ -74,7 +74,7 @@ export const updateMyProfile = (req: Request, res: Response, next: NextFunction)
 
 export const disableMyAccount = (req: Request, res: Response, next: NextFunction) => {
   try {
-    res.json({ message: 'Success' });
+    res.status(405).send();
   } catch (error) {
     next(error);
   }
@@ -82,7 +82,7 @@ export const disableMyAccount = (req: Request, res: Response, next: NextFunction
 
 export const deleteMyAccount = (req: Request, res: Response, next: NextFunction) => {
   try {
-    res.json({ message: 'Success' });
+    res.status(405).send();
   } catch (error) {
     next(error);
   }

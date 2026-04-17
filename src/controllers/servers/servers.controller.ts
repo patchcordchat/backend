@@ -149,7 +149,7 @@ export const deleteServer = async (
     await ServerMember.deleteMany({ server_id: serverId });
     await Role.deleteMany({ server_id: serverId });
 
-    res.json({ message: 'Success' });
+    res.status(204).send();
   } catch (error) {
     next(error);
   }
@@ -386,7 +386,7 @@ export const leaveFromServer = async (
       return res.json({ message: 'You are not a member of this server' });
     }
 
-    res.json({ message: 'Success' });
+    res.status(204).send();
   } catch (error) {
     next(error);
   }
