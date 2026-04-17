@@ -4,6 +4,9 @@ import {
   sendFriendRequestSchema,
   createRelationshipSchema,
   modifyRelationshipSchema,
+  ignoreUserSchema,
+  bulkRemoveRelationshipSchema,
+  bulkCreateRelationshipsSchema,
 } from '@/schemas/relationship.schema';
 
 // const POPULATE_USER_FIELDS = 'username global_name avatar public_flags bot';
@@ -29,7 +32,11 @@ export const sendFriendRequest = async (
 };
 
 export const createRelationship = async (
-  req: ValidatedRequest<unknown, unknown, typeof createRelationshipSchema.body>,
+  req: ValidatedRequest<
+    typeof createRelationshipSchema.params,
+    unknown,
+    typeof createRelationshipSchema.body
+  >,
   res: Response,
   next: NextFunction,
 ) => {
@@ -40,7 +47,11 @@ export const createRelationship = async (
   }
 };
 
-export const ignoreUser = async (req: Request, res: Response, next: NextFunction) => {
+export const ignoreUser = async (
+  req: ValidatedRequest<typeof ignoreUserSchema.params>,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     res.json('Success');
   } catch (error) {
@@ -48,7 +59,11 @@ export const ignoreUser = async (req: Request, res: Response, next: NextFunction
   }
 };
 
-export const unignoreUser = async (req: Request, res: Response, next: NextFunction) => {
+export const unignoreUser = async (
+  req: ValidatedRequest<typeof ignoreUserSchema.params>,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     res.json('Success');
   } catch (error) {
@@ -57,7 +72,11 @@ export const unignoreUser = async (req: Request, res: Response, next: NextFuncti
 };
 
 export const modifyRelationship = async (
-  req: ValidatedRequest<unknown, unknown, typeof modifyRelationshipSchema.body>,
+  req: ValidatedRequest<
+    typeof modifyRelationshipSchema.params,
+    unknown,
+    typeof modifyRelationshipSchema.body
+  >,
   res: Response,
   next: NextFunction,
 ) => {
@@ -68,7 +87,11 @@ export const modifyRelationship = async (
   }
 };
 
-export const removeRelationship = async (req: Request, res: Response, next: NextFunction) => {
+export const removeRelationship = async (
+  req: ValidatedRequest<typeof modifyRelationshipSchema.params>,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     res.json('Success');
   } catch (error) {
@@ -76,7 +99,15 @@ export const removeRelationship = async (req: Request, res: Response, next: Next
   }
 };
 
-export const bulkRemoveRelationships = async (req: Request, res: Response, next: NextFunction) => {
+export const bulkRemoveRelationships = async (
+  req: ValidatedRequest<
+    unknown,
+    typeof bulkRemoveRelationshipSchema.query,
+    typeof bulkRemoveRelationshipSchema.body
+  >,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     res.json('Success');
   } catch (error) {
@@ -84,7 +115,11 @@ export const bulkRemoveRelationships = async (req: Request, res: Response, next:
   }
 };
 
-export const bulkCreateRelationships = async (req: Request, res: Response, next: NextFunction) => {
+export const bulkCreateRelationships = async (
+  req: ValidatedRequest<unknown, unknown, typeof bulkCreateRelationshipsSchema.body>,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     res.json('Success');
   } catch (error) {
