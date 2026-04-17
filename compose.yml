@@ -58,6 +58,7 @@ services:
       retries: 5
       start_period: 10s
 
+  # Create Minio buckets
   createbuckets:
     image: minio/mc
     depends_on:
@@ -70,6 +71,52 @@ services:
       done; /usr/bin/mc mb minio/${S3_BUCKET}; exit 0;"
     networks:
       - backend
+
+  # RabbitMQ
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - 5672:5672
+      - 15672:15672
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-guest}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS:-guest}
+    networks:
+      - backend
+    healthcheck:
+      test: [ "CMD", "rabbitmq-diagnostics", "check_running" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  cert-gen:
+    image: alpine:latest
+    volumes:
+      - ./certs:/certs
+    entrypoint: >+
+      sh -c "apk add --no-cache openssl && 
+        mkdir -p /certs && 
+        if [ ! -f /certs/cert.pem ]; then
+          openssl req -x509 -newkey rsa:4096 -keyout /certs/key.pem -out /certs/cert.pem -days 365 -nodes -subj '/CN=localhost';
+          chmod 644 /certs/cert.pem /certs/key.pem;
+          echo 'Certificates generated';
+        else
+          echo 'Certificates already exist';
+        fi"
+
+  mailpit:
+    image: axllent/mailpit
+    container_name: mailpit
+    volumes:
+      - ./.data/mailpit:/data
+      - ./docker/mailpit/certs:/certs
+    ports:
+      - 8025:8025
+      - ${SMTP_PORT}:1025
+    environment:
+      MP_SMTP_AUTH: "${SMTP_USER}:${SMTP_PASS}"
+      MP_SMTP_TLS_CERT: ./certs/cert.pem
+      MP_SMTP_TLS_KEY: ./certs/key.pem
 
 networks:
   backend:

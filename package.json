@@ -17,6 +17,7 @@
   "description": "",
   "dependencies": {
     "@aws-sdk/client-s3": "^3.948.0",
+    "amqplib": "^1.0.3",
     "bcryptjs": "^3.0.3",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
@@ -27,6 +28,7 @@
     "mongoose": "^8.19.2",
     "morgan": "^1.10.1",
     "multer": "^2.0.2",
+    "nodemailer": "^8.0.5",
     "socket.io": "^4.8.1",
     "tsconfig-paths": "^4.2.0",
     "ua-parser-js": "^2.0.6",
@@ -34,6 +36,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
+    "@types/amqplib": "^0.10.8",
     "@types/cookie": "^0.6.0",
     "@types/cookie-parser": "^1.4.10",
     "@types/cookie-signature": "^1.1.2",
@@ -43,6 +46,7 @@
     "@types/morgan": "^1.9.10",
     "@types/multer": "^2.0.0",
     "@types/node": "^24.9.2",
+    "@types/nodemailer": "^8.0.0",
     "eslint": "^9.39.2",
     "jest": "^30.2.0",
     "jiti": "^2.6.1",
