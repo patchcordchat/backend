@@ -1,14 +1,31 @@
 import express from 'express';
-import itemRoutes from './routes/exampleRoutes';
-import { errorHandler } from './middlewares/errorHandler';
+import morgan from 'morgan';
+import cors from 'cors';
+import cookieParser from 'cookie-parser';
+import config from '@/config';
+import { errorMiddleware, authMiddleware } from '@/middlewares';
+import { userRoutes, serverRoutes, channelRoutes, authRoutes } from '@/routes';
 
 const app = express();
 
-app.use(express.json());
+app.use(
+  cors({
+    origin: config.app.env === 'development' ? '*' : config.app.clientUrl,
+  }),
+);
+app.use(morgan(config.app.env === 'development' ? 'dev' : 'tiny'));
+app.use(
+  express.json({
+    limit: '50mb',
+  }),
+);
+app.use(cookieParser(config.app.secretKey));
 
 // Routes
-app.use('/api/items', itemRoutes);
-
-app.use(errorHandler);
+app.use('/users', authMiddleware, userRoutes);
+app.use('/servers', authMiddleware, serverRoutes);
+app.use('/channels', authMiddleware, channelRoutes);
+app.use('/auth', authRoutes);
+app.use(errorMiddleware);
 
 export default app;

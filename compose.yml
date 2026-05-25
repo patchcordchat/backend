@@ -1,0 +1,123 @@
+name: patchcord
+
+services:
+  # MongoDB
+  mongodb:
+    image: mongo:4.4
+    ports:
+      - ${MONGO_PORT:-27017}:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_DATABASE}
+    volumes:
+      - ./.data/db:/data/db
+    networks:
+      - backend
+    healthcheck:
+      test: [ "CMD", "mongo", "--eval", "db.runCommand('ping').ok" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  # Redis
+  redis:
+    image: redis:8.4
+    ports:
+      - ${REDIS_PORT:-6379}:6379
+    volumes:
+      - ./.data/cache:/data
+    networks:
+      - backend
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  # Minio 
+  minio:
+    image: minio/minio:RELEASE.2025-09-07T16-13-09Z
+    command: server /data/minio --console-address ":9090"
+    ports:
+      - 9000:9000
+      - 9090:9090
+    environment:
+      MINIO_ROOT_USER: ${S3_ACCESS_KEY}
+      MINIO_ROOT_PASSWORD: ${S3_SECRET_KEY}
+    volumes:
+      - './.data/s3:/data/minio'
+    networks:
+      - backend
+    healthcheck:
+      test: [ "CMD", "mc", "ready", "local" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # Create Minio buckets
+  createbuckets:
+    image: minio/mc
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "while ! /usr/bin/mc ready minio; do
+        /usr/bin/mc alias set minio http://minio:9000 ${S3_ACCESS_KEY} ${S3_SECRET_KEY};
+        echo 'Waiting minio...' && sleep 1;
+      done; /usr/bin/mc mb minio/${S3_BUCKET}; exit 0;"
+    networks:
+      - backend
+
+  # RabbitMQ
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - 5672:5672
+      - 15672:15672
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-guest}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS:-guest}
+    networks:
+      - backend
+    healthcheck:
+      test: [ "CMD", "rabbitmq-diagnostics", "check_running" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  cert-gen:
+    image: alpine:latest
+    volumes:
+      - ./certs:/certs
+    entrypoint: >+
+      sh -c "apk add --no-cache openssl && 
+        mkdir -p /certs && 
+        if [ ! -f /certs/cert.pem ]; then
+          openssl req -x509 -newkey rsa:4096 -keyout /certs/key.pem -out /certs/cert.pem -days 365 -nodes -subj '/CN=localhost';
+          chmod 644 /certs/cert.pem /certs/key.pem;
+          echo 'Certificates generated';
+        else
+          echo 'Certificates already exist';
+        fi"
+
+  mailpit:
+    image: axllent/mailpit
+    container_name: mailpit
+    volumes:
+      - ./.data/mailpit:/data
+      - ./docker/mailpit/certs:/certs
+    ports:
+      - 8025:8025
+      - ${SMTP_PORT}:1025
+    environment:
+      MP_SMTP_AUTH: "${SMTP_USER}:${SMTP_PASS}"
+      MP_SMTP_TLS_CERT: ./certs/cert.pem
+      MP_SMTP_TLS_KEY: ./certs/key.pem
+
+networks:
+  backend:
+    driver: bridge

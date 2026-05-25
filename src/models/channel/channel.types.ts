@@ -1,0 +1,31 @@
+import { Types, type Document } from 'mongoose';
+
+export enum ChannelTypes {
+  TEXT = 0,
+  VOICE = 1,
+  DM = 2,
+  GROUP_DM = 3,
+}
+
+export enum ChannelFlags {
+  NONE = 0,
+  PINNED = 1 << 0,
+  IS_SPAM = 1 << 1,
+}
+
+export interface IChannel extends Document {
+  _id: Types.ObjectId;
+  id: Types.ObjectId;
+  type: ChannelTypes;
+  server_id: Types.ObjectId;
+  position: number;
+  name: string;
+  last_message_id?: string;
+  user_limit: number;
+  recipients: Types.ObjectId[];
+  owner_id: Types.ObjectId;
+  member_count: number;
+  flags: ChannelFlags;
+  created_at: number;
+  updated_at: number;
+}

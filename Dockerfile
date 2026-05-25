@@ -1,23 +1,29 @@
-# Use an official lightweight Node.js image.
-FROM node:25-alpine
-
-# Set the working directory in the container.
-WORKDIR /usr/src/app
-
-# Copy package.json and package-lock.json (if available)
+FROM node:25-alpine AS builder
+RUN apk add --no-cache \
+    python3 \
+    py3-pip \
+    make \
+    g++ \
+    linux-headers \
+    pkgconfig \
+    openssl-dev
+WORKDIR /app
 COPY package*.json ./
-
-# Install dependencies.
 RUN npm install
-
-# Copy the rest of the source code.
 COPY . .
-
-# Build the project (assuming tsc is configured to output to the 'dist' folder)
 RUN npm run build
+RUN npm prune --production
 
-# Expose the port (make sure this matches your config; here we assume 3000)
+FROM node:25-alpine AS prod
+WORKDIR /app
+RUN apk add --no-cache openssl
+RUN chown node:node /app
+USER node
+COPY --chown=node:node package*.json ./
+COPY --chown=node:node --from=builder /app/node_modules ./node_modules
+COPY --chown=node:node --from=builder /app/dist ./dist
+ENV NODE_ENV=production
 EXPOSE 3000
-
-# Start the application.
-CMD ["npm", "start"]
+EXPOSE 10000-10100/udp
+EXPOSE 10000-10100/tcp
+CMD ["node", "dist/server.js"]
