@@ -1,10 +1,26 @@
 import { Request, Response, NextFunction } from 'express';
+import {
+  getServerChannelsSchema,
+  createServerChannelSchema,
+  modifyChannelPositionSchema,
+  getChannelSchema,
+  modifyChannelSchema,
+  deleteChannelSchema,
+  getDMChannelSchema,
+  triggerTypingSchema,
+  createPrivateChannelSchema,
+  getCallEligibilitySchema,
+} from '@/schemas/channel.schema';
 import Server from '@/models/server';
 import Channel, { ChannelTypes } from '@/models/channel';
 import { getIO } from '@/socket';
-import { NotFoundError, ApiError } from '@/errors';
+import { NotFoundError, ApiError, UnauthorizedError } from '@/errors';
 
-export const getServerChannels = async (req: Request, res: Response, next: NextFunction) => {
+export const getServerChannels = async (
+  req: ValidatedRequest<typeof getServerChannelsSchema.params>,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const serverId = req.params?.server_id;
 
@@ -21,7 +37,15 @@ export const getServerChannels = async (req: Request, res: Response, next: NextF
   }
 };
 
-export const createServerChannel = async (req: Request, res: Response, next: NextFunction) => {
+export const createServerChannel = async (
+  req: ValidatedRequest<
+    typeof createServerChannelSchema.params,
+    unknown,
+    typeof createServerChannelSchema.body
+  >,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const serverId = req.params?.server_id;
     const userId = req.session?.user_id;
@@ -47,10 +71,18 @@ export const createServerChannel = async (req: Request, res: Response, next: Nex
   }
 };
 
-export const modifyChannelPosition = async (req: Request, res: Response, next: NextFunction) => {
+export const modifyChannelPosition = async (
+  req: ValidatedRequest<
+    typeof modifyChannelPositionSchema.params,
+    unknown,
+    typeof modifyChannelPositionSchema.body
+  >,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const serverId = req.params?.server_id;
-    const channelId = req.params?.channel_id;
+    const channelId = req.body?.id;
     const userId = req.session?.user_id;
 
     const server = await Server.findById(serverId);
@@ -62,7 +94,7 @@ export const modifyChannelPosition = async (req: Request, res: Response, next: N
 
     const channel = await Channel.findOneAndUpdate(
       { _id: channelId, server_id: serverId },
-      ...req.body,
+      { position: req.body.position },
       { new: true },
     );
 
@@ -74,7 +106,11 @@ export const modifyChannelPosition = async (req: Request, res: Response, next: N
   }
 };
 
-export const getChannel = async (req: Request, res: Response, next: NextFunction) => {
+export const getChannel = async (
+  req: ValidatedRequest<typeof getChannelSchema.params>,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const { channel_id } = req.params;
     const channel = await Channel.findById(channel_id);
@@ -87,7 +123,15 @@ export const getChannel = async (req: Request, res: Response, next: NextFunction
   }
 };
 
-export const modifyChannel = async (req: Request, res: Response, next: NextFunction) => {
+export const modifyChannel = async (
+  req: ValidatedRequest<
+    typeof modifyChannelSchema.params,
+    unknown,
+    typeof modifyChannelSchema.body
+  >,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const channelId = req.params?.channel_id;
 
@@ -103,7 +147,11 @@ export const modifyChannel = async (req: Request, res: Response, next: NextFunct
   }
 };
 
-export const deleteChannel = async (req: Request, res: Response, next: NextFunction) => {
+export const deleteChannel = async (
+  req: ValidatedRequest<typeof deleteChannelSchema.params>,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const channelId = req.params?.channel_id;
 
@@ -112,7 +160,7 @@ export const deleteChannel = async (req: Request, res: Response, next: NextFunct
 
     await channel.deleteOne();
 
-    res.json({ message: 'Success' });
+    res.status(204).send();
   } catch (error) {
     next(error);
   }
@@ -133,13 +181,21 @@ export const getPrivateChannels = async (req: Request, res: Response, next: Next
   }
 };
 
-export const createPrivateChannel = async (req: Request, res: Response, next: NextFunction) => {
+export const createPrivateChannel = async (
+  req: ValidatedRequest<unknown, unknown, typeof createPrivateChannelSchema.body>,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const userId = req.session?.user_id;
 
+    if (!userId) {
+      throw new UnauthorizedError();
+    }
+
     const newChannel = new Channel({
       ...req.body,
-      recipients: req.body.recipients.push(userId),
+      recipients: req.body.recipients.push(userId.toString()),
       type: ChannelTypes.DM,
       owner_id: userId,
     });
@@ -152,7 +208,11 @@ export const createPrivateChannel = async (req: Request, res: Response, next: Ne
   }
 };
 
-export const getDMChannel = async (req: Request, res: Response, next: NextFunction) => {
+export const getDMChannel = async (
+  req: ValidatedRequest<typeof getDMChannelSchema.params>,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const userId = req.session?.user_id;
     const recipientId = req.params?.user_id;
@@ -168,22 +228,30 @@ export const getDMChannel = async (req: Request, res: Response, next: NextFuncti
   }
 };
 
-export const triggerTyping = async (req: Request, res: Response, next: NextFunction) => {
+export const triggerTyping = async (
+  req: ValidatedRequest<typeof triggerTypingSchema.params>,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const channelId = req.params?.channel_id;
 
     const io = getIO();
     io.to(`channel:${channelId}`).emit('typing:start', channelId);
 
-    res.json({ message: 'Success' });
+    res.status(204).send();
   } catch (error) {
     next(error);
   }
 };
 
-export const getCallEligibility = async (req: Request, res: Response, next: NextFunction) => {
+export const getCallEligibility = async (
+  req: ValidatedRequest<typeof getCallEligibilitySchema.params>,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
-    res.json({ message: 'Success' });
+    res.status(405).send();
   } catch (error) {
     next(error);
   }

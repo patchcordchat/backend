@@ -4,6 +4,8 @@ import config from '@/config';
 import { initSocket } from './socket';
 import { initMongoose } from './lib/mongoose';
 import { initMediasoup } from './lib/mediasoup';
+import { rabbitMQ } from '@/lib/rabbitmq';
+import { startMailWorker } from '@/workers/mail.worker';
 
 (async function run() {
   try {
@@ -12,6 +14,10 @@ import { initMediasoup } from './lib/mediasoup';
 
     // Mediasoup
     await initMediasoup();
+
+    // RabbitMQ
+    await rabbitMQ.connect();
+    await startMailWorker();
 
     // Server
     const server: Server = createServer(app);

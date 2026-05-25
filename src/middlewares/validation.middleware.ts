@@ -5,17 +5,17 @@ import { z } from 'zod';
 
 const descriptor = Object.getOwnPropertyDescriptor(express.request, 'query');
 if (descriptor) {
-	Object.defineProperty(express.request, 'query', {
-		get(this: Request) {
-			if (this.hasOwnProperty('_query')) return this._query;
-			return descriptor?.get?.call(this);
-		},
-		set(this: Request, query: unknown) {
-			this._query = query;
-		},
-		configurable: true,
-		enumerable: true
-	});
+  Object.defineProperty(express.request, 'query', {
+    get(this: Request) {
+      if (this._query !== undefined) return this._query;
+      return descriptor?.get?.call(this);
+    },
+    set(this: Request, query: unknown) {
+      this._query = query;
+    },
+    configurable: true,
+    enumerable: true,
+  });
 }
 
 type RequestPart = 'body' | 'query' | 'params';
@@ -33,7 +33,7 @@ const validateRequest =
       const [validatedBody, validatedQuery, validatedParams] = result as [
         typeof req.body,
         typeof req.query,
-        typeof req.params
+        typeof req.params,
       ];
 
       req.body = validatedBody;
