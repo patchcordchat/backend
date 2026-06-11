@@ -1,6 +1,15 @@
 <div align="center">
-    <h1>Patchcord Backend</h1>
+<h1>
+  Patchcord Backend
+  
+  ![Stars](https://img.shields.io/github/stars/patchcordchat/backend?style=flat-square&logoColor=white)
+  ![Forks](https://img.shields.io/github/forks/patchcordchat/backend?style=flat-square&logoColor=white)
+  ![Issues](https://img.shields.io/github/issues/patchcordchat/backend?style=flat-square&logoColor=white)
+  ![Watchers](https://img.shields.io/github/watchers/patchcordchat/backend?style=flat-square&logoColor=white)
+  ![Contributors](https://img.shields.io/github/contributors/patchcordchat/backend)
+</h1>
 </div>
+<br/>
 
 ## Руководство по разработке
 
